@@ -9,6 +9,7 @@ import Contact from './components/Contact';
 import Admin from './components/Admin';
 import Login from './components/Login';
 import CheckOut from './components/CheckOut';
+import PaymentInfo from './components/PaymentInfo';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/location" element={<Location />}/>
       <Route path="/contact" element={<Contact />}/>
       <Route path="/check-out" element={<CheckOut />}/>
+      <Route path="/payment-information" element={<PaymentInfo />} />
       <Route path="/auth-login" element={<Login />}/>
       
       <Route path="/secure-admin" element={<Admin />}/>

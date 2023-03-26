@@ -1,29 +1,42 @@
 import React, { useContext, useState } from 'react'
 import { BiMinus, BiPlus } from 'react-icons/bi'
-import { useNavigate} from 'react-router-dom'
 import { Context } from '../context/GlobalState'
+import HotelsModal from './HotelsModal'
 
 export default function Home() {
 
-  const [roomType, setRoomType] = useState([])
+  const [showModel, setShowModel] = useState(false)
   const { actions, booking } = useContext(Context)
 
-  const navigate = useNavigate()
 
   const handleOnSubmit = () => {
-    navigate('check-out')
+    // navigate('check-out')
+    if (booking.checkIn && booking.checkOut && booking.checkOut >= booking.checkIn) {
+      setShowModel(true)
+    }
   }
 
   const handleCheckIn = (e) => {
     const value = e.target.value.replace('/', '-')
-
+    actions({type: 'SET_BOOKING', payload: {...booking, checkIn: value}})
   }
 
   const handleCheckOut = (e) => {
     const value = e.target.value.replace('/', '-')
-
+    actions({type: 'SET_BOOKING', payload: {...booking, checkOut: value}})
   }
 
+  const handleMinus = (person) => {
+    if ((person === 'adult' && booking[person] <= 1) || booking[person] <= 0) return
+    actions({type: 'SET_BOOKING', payload: {...booking, [person]: booking[person] - 1}})
+  }
+
+  const handlePlus = (person) => {
+    if (booking[person] >= 4) return
+    actions({type: 'SET_BOOKING', payload: {...booking, [person]: booking[person] + 1}})
+  }
+
+  const datePickerId = new Date().toISOString().split("T")[0];
   return (
     <div className='flex-grow relative flex mx-[-2rem]'>
       <div className='absolute top-0 w-full h-full'>
@@ -41,12 +54,12 @@ export default function Home() {
               <div className='w-full flex justify-between items-center'>
                 <div className='flex flex-col'>
                   <label htmlFor=""> Check in </label>
-                  <input className='p-1 rounded-sm' type="date" />
+                  <input min={datePickerId} onChange={handleCheckIn} className='p-1 rounded-sm' type="date" />
                 </div>
 
                 <div className='flex flex-col'>
                   <label htmlFor=""> Check out </label>
-                  <input className='p-1 rounded-sm' type="date" />
+                  <input min={booking.checkIn > datePickerId ? booking.checkIn : datePickerId} onChange={handleCheckOut} className='p-1 rounded-sm' type="date" />
                 </div>
 
               </div>
@@ -57,9 +70,9 @@ export default function Home() {
                     <h4 className='font-medium'> Adult(s) </h4>
                   </div>
                   <div className='flex items-center py-2 px-3 border rounded border-black'>
-                    <BiMinus className='cursor-pointer text-gray-600 hover:text-black' size={20} />
-                    <span className='px-4 font-medium'>1</span>
-                    <BiPlus className='cursor-pointer text-gray-600 hover:text-black' size={20} />
+                    <BiMinus onClick={handleMinus.bind(this, 'adult')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
+                    <span className='px-4 font-medium'> {booking.adult} </span>
+                    <BiPlus onClick={handlePlus.bind(this, 'adult')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                   </div>
 
                 </div>
@@ -69,9 +82,9 @@ export default function Home() {
                     <h4 className='font-medium'> Children </h4>
                   </div>
                   <div className='flex items-center py-2 px-3 border rounded border-black'>
-                    <BiMinus className='cursor-pointer text-gray-600 hover:text-black' size={20} />
-                    <span className='px-4 font-medium'>1</span>
-                    <BiPlus className='cursor-pointer text-gray-600 hover:text-black' size={20} />
+                    <BiMinus onClick={handleMinus.bind(this, 'children')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
+                    <span className='px-4 font-medium'> {booking.children} </span>
+                    <BiPlus onClick={handlePlus.bind(this, 'children')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                   </div>
 
                 </div>
@@ -83,23 +96,16 @@ export default function Home() {
                 <button className='px-4 bg-primaryBlue rounded ml-[-10px] text-gray-0 hover:bg-[#1162be]'>Apply</button>
               </div>
 
-              <div className='flex w-full items-center justify-between mt-8'>
-                <h4 className='font-medium'> Room type </h4>
-                <select>
-                  <option value="">1</option>
-                  <option value="">3</option>
-                  <option value="">3</option>
-                </select>
-              </div>
-
               <div className='flex w-full mt-8'>
-                <button onClick={handleOnSubmit} className='py-2 px-3 bg-[#8f3237] rounded text-gray-0 hover:bg-[#77282c]'>Submit</button>
+                <button onClick={handleOnSubmit} className='py-2 px-3 bg-[#8f3237] rounded text-gray-0 hover:bg-[#77282c]'>Check Availability</button>
 
               </div>
             </div>
           </aside>
         </div>
       </div>
+       {showModel && <HotelsModal setShowModel={setShowModel} />}
+
     </div>
   )
 }

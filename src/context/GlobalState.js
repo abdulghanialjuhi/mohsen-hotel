@@ -8,8 +8,8 @@ export default function GlobalState() {
   const [booking, setBooking] = useState({
     checkIn: '',
     checkOut: '',
-    discountPercent: ''
-
+    adult: 1,
+    children: 0
   })
 
   const actions = (action) => {

@@ -2,15 +2,17 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA6zrqztpiNAqsU5AHF6fCksNA6RgSlF5k",
-  authDomain: "mk-hotel.firebaseapp.com",
-  databaseURL: "https://mk-hotel-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "mk-hotel",
-  storageBucket: "mk-hotel.appspot.com",
-  messagingSenderId: "854792474553",
-  appId: "1:854792474553:web:aa2a76f1cb5dcb0020b068"
+  apiKey: "AIzaSyDcy5jAa23d70iZNT_SYANTLWH7SS4BXHI",
+  authDomain: "mk-hotel-7a905.firebaseapp.com",
+  databaseURL: "https://mk-hotel-7a905-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mk-hotel-7a905",
+  storageBucket: "mk-hotel-7a905.appspot.com",
+  messagingSenderId: "178081465976",
+  appId: "1:178081465976:web:27389ef78486e4e482cf8d",
+  measurementId: "G-XSBFTCTYVK"
 };
 
 // Initialize Firebase
@@ -18,3 +20,4 @@ export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const database = getDatabase(app);
 export const auth = getAuth(app);
+export const storage = getStorage(app);

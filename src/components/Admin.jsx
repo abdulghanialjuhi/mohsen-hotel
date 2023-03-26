@@ -26,7 +26,6 @@ export default function Admin() {
         const dataArr = []
         const dbRef = ref(getDatabase());
         try {
-
             const snapshot = await get(child(dbRef, table))
             if (snapshot.exists()) {
                 for (let i in snapshot.val()) {
@@ -48,7 +47,6 @@ export default function Admin() {
 
     useEffect(() => {
         getDate(tableName).then((res) => {
-            // console.log('rees', res);
             setData(res)
             Object.keys(res[0]).forEach((key) => {
                 if (keys.includes(key)) return
