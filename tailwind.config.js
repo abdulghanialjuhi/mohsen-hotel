@@ -29,6 +29,7 @@ module.exports = {
         darkColor: '#0a0a0a',
         primaryBlue: '#0070f3',
       },
+      display: ["group-hover"]
     },
     fontFamily: {
       'sans': 'Arial',

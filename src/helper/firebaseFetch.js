@@ -1,7 +1,7 @@
 import { getDatabase, ref, child, get } from "firebase/database";
-import { ref as ref1, getDownloadURL } from "firebase/storage";
+import { ref as ref1, getDownloadURL, listAll, uploadBytes } from "firebase/storage";
 import { db, storage } from '../firebaseConfig'
-import { collection, getDocs } from "firebase/firestore"; 
+import { collection, getDocs, doc } from "firebase/firestore"; 
 
 export const getDate = async (table) => {
     const dataArr = []
@@ -25,15 +25,61 @@ export const getDate = async (table) => {
 
 }
 
-export const getPic = async () => {
+export const getCollectionData = async (table, isCollection) => {
+    const dataArr = []
+    let querySnapshot 
+    if (isCollection) {
+        querySnapshot = await getDocs(collection(db, table));
+    } else {
+        querySnapshot = await getDocs(collection(db, table));
+    }
+
+    querySnapshot.forEach((doc) => {
+        const data = {}
+        data['record'] = doc.data()
+        data['id'] = doc.id
+        dataArr.push(data)
+    });
+
+    return dataArr
+}
+
+export const getPic = async (imgPath) => {
     try {
-        return await getDownloadURL(ref1(storage, `roomPic.jpeg`))
+        return await getDownloadURL(ref1(storage, imgPath))
     } catch (err) {
         console.log(err);
         throw err
     }
 }
 
+export const getImages = async (folderPath) => {
+
+    try {
+        const listRef = ref1(storage, folderPath);
+        const images = []
+        const res = await listAll(listRef)
+        
+        if (!res.items.length > 0) {
+            throw "No images found";
+        }
+        await Promise.all(res.items.map(async (itemRef) => {
+            const url = await getDownloadURL(ref1(storage, `${folderPath}/${itemRef.name}`))
+            images.push(url)
+        }));
+
+        return images
+    } catch (err) {
+        throw err
+    }
+
+}
+
+export const uploadImage = async (imgPah, imageUri, index) => {
+    const response = await fetch(imageUri);
+    const blob = await response.blob();
+    return await uploadBytes(ref1(storage, `${imgPah}/${index}`), blob)
+}
 
 export const getDataCollection = async (table) => {
     const dataArr = []

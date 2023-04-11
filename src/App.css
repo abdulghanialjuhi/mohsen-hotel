@@ -24,4 +24,14 @@
   h2 {
     @apply text-xl xs:text-2xl sm:text-3xl md:text-4xl
   }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
 }

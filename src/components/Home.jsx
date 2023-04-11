@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { BiMinus, BiPlus } from 'react-icons/bi'
 import { Context } from '../context/GlobalState'
 import HotelsModal from './HotelsModal'
@@ -6,18 +6,22 @@ import HotelsModal from './HotelsModal'
 export default function Home() {
 
   const [showModel, setShowModel] = useState(false)
+  const [minCheckIn, setMinCheckIn] = useState()
   const { actions, booking } = useContext(Context)
 
 
   const handleOnSubmit = () => {
     // navigate('check-out')
-    if (booking.checkIn && booking.checkOut && booking.checkOut >= booking.checkIn) {
+    if (booking.checkIn && booking.checkOut && booking.checkOut > booking.checkIn) {
       setShowModel(true)
     }
   }
 
   const handleCheckIn = (e) => {
     const value = e.target.value.replace('/', '-')
+    let date = new Date(value)
+    date.setDate(date.getDate() + 1)
+    setMinCheckIn(date.toISOString().split("T")[0])
     actions({type: 'SET_BOOKING', payload: {...booking, checkIn: value}})
   }
 
@@ -36,7 +40,14 @@ export default function Home() {
     actions({type: 'SET_BOOKING', payload: {...booking, [person]: booking[person] + 1}})
   }
 
-  const datePickerId = new Date().toISOString().split("T")[0];
+  useEffect(() => {
+  let todayDate = new Date()
+  todayDate.setDate(todayDate.getDate() + 1)
+  setMinCheckIn(todayDate.toISOString().split("T")[0])
+  }, [])
+
+  const todayDate = new Date().toISOString().split("T")[0]
+
   return (
     <div className='flex-grow relative flex mx-[-2rem]'>
       <div className='absolute top-0 w-full h-full'>
@@ -54,12 +65,12 @@ export default function Home() {
               <div className='w-full flex justify-between items-center'>
                 <div className='flex flex-col'>
                   <label htmlFor=""> Check in </label>
-                  <input min={datePickerId} onChange={handleCheckIn} className='p-1 rounded-sm' type="date" />
+                  <input min={todayDate} onChange={handleCheckIn} className='p-1 rounded-sm' type="date" />
                 </div>
 
                 <div className='flex flex-col'>
                   <label htmlFor=""> Check out </label>
-                  <input min={booking.checkIn > datePickerId ? booking.checkIn : datePickerId} onChange={handleCheckOut} className='p-1 rounded-sm' type="date" />
+                  <input min={minCheckIn} onChange={handleCheckOut} className='p-1 rounded-sm' type="date" />
                 </div>
 
               </div>

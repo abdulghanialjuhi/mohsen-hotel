@@ -50,7 +50,7 @@ const HotelRoom = (props) => {
     useEffect(() => {
         checkAvailability()
 
-        getPic().then((res) => {
+        getPic('roomPic.jpeg').then((res) => {
             setRoomPic(res);
         }).catch((err) => {
             console.log(err);

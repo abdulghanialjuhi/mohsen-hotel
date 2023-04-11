@@ -10,8 +10,15 @@ export default function CheckOut() {
   const { booking } = useContext(Context) 
   const [contactInfo, setContactInfo] = useState({fullName: null, email: null, phone: null})
   const [salutation, setsalutation] = useState('Mr')
+  const [guestSalutation, setGuestSalutation] = useState('Mr')
   const [loading, setLoading] = useState(true)
   const [submitLoading, setSubmitLoading] = useState(false)
+  const [guestInfo, setGuestInfo] = useState({
+    fullName: null,
+    email: null,
+    phone: null
+  })
+  const [isGuest, setIsGuest] = useState(false)
   const navigate = useNavigate()
 
   // console.log('booking: ', booking);
@@ -49,13 +56,22 @@ export default function CheckOut() {
     return false;
   });
 
+
+  const guestNullish = Object.values(guestInfo).some(value => {
+    if (value === null || value === '') {
+      return true;
+    }
+  
+    return false;
+  });
+
   const handleSubmit = async () => {
-    if (isNullish) {
+    if (isNullish || (guestNullish && isGuest)) {
         alert('please fill in all fields')
         return
     }
 
-    if ((!/^[0-9]+$/.test(contactInfo.phone))) {
+    if ((!/^[0-9]+$/.test(contactInfo.phone)) || (!/^[0-9]+$/.test(guestInfo.phone) && isGuest)) {
         alert('invalid phone number')
         return
     }
@@ -65,14 +81,21 @@ export default function CheckOut() {
         const docRef = await addDoc(collection(db, "booking"), {
             checkInDate: booking.checkIn,
             checkOutDate: booking.checkOut,
-            email: contactInfo.email,
-            fullName: salutation + contactInfo.fullName,
-            phone: contactInfo.phone,
+            email: `${isGuest ? guestInfo.email : contactInfo.email}`,
+            fullName: `${salutation} ${isGuest ? guestInfo.fullName : contactInfo.fullName}`,
+            phone: `${isGuest ? guestInfo.phone : contactInfo.phone}`,
             roomID: booking.room.roomID,
             total: booking.room.price * getNights()
         });
 
-        console.log(docRef);
+        const docRef1 = await addDoc(collection(db, "booking", docRef.id, 'contact'), {
+            email: contactInfo.email,
+            fullName: `${salutation} ${contactInfo.fullName}`,
+            phone: contactInfo.phone,
+        });
+
+        console.log(docRef.id);
+        console.log(docRef1);
         navigate('/payment-information')
     } catch (err) {
         console.log('err: ', err);
@@ -81,7 +104,6 @@ export default function CheckOut() {
     }
   }
 
-  useEffect(() => console.log(contactInfo), [contactInfo])
 
   if (loading) {
     return (
@@ -144,21 +166,67 @@ export default function CheckOut() {
 
                     <div className='flex flex-col mx-2'>
                         <label> Salutation </label>
-                        <select defaultValue={setsalutation} onChange={(e) => setsalutation(e.target.value)} name="salutation" className='border mt-1 rounded p-1'>
+                        <select defaultValue={salutation} onChange={(e) => setsalutation(e.target.value)} name="salutation" className='border mt-1 rounded p-1'>
                             <option value="Mr">MR</option>
                             <option value="Ms">MS</option>
                         </select>
                     </div>
 
                     <ContactForm label='full name' name='name' fieldName='fullName' setContactInfo={setContactInfo} />
-                    {/* <ContactForm label='last name' name='name' /> */}
-                    {/* <ContactForm label='city' name='city' /> */}
                     <ContactForm label='email' name='email' fieldName='email' setContactInfo={setContactInfo} />
                     <ContactForm label='phone number' name='phone' pattern="[0-9]*" fieldName='phone'  setContactInfo={setContactInfo} />
 
                 </div>
 
             </div>
+
+            <div className='flex w-full py-2 gap-1 mt-3'>
+                <input type="checkbox" value={isGuest} onChange={() => setIsGuest(!isGuest)} />
+                <label>I'm Booking for someone else</label>
+
+            </div>
+
+           {isGuest && <div className='w-full mt-6 rounded overflow-hidden bg-gray-0 shadow-md min-h-[200px]'>
+                <div className='w-full h-12 bg-primaryBlue flex items-center p-2 text-gray-0'>
+                    <h4> Guest Details </h4>
+                </div>
+                <div className='w-full flex items-center gap-4 h-[5rem] py-3'>
+                    <div className='w-[40%] h-[90%] bg-gray-400 flex items-center text-gray-0 p-2'>
+                        <span>{booking.room.name} - {getNights()} NIGHT(S)</span>
+                    </div>
+
+                    <div className='flex-grow h-full flex justify-center items-center p-2'>
+                        <div className='w-[70%] flex justify-between'>
+
+                            <div className='flex flex-col justify-center'>
+                                <span className='uppercase text-gray-400 text-[12px]'>check-in</span>
+                                <h6 className='text-[15px] mt-1'>{booking.checkIn}</h6>
+                            </div>
+                            <div className='flex flex-col justify-center'>
+                                <span className='uppercase text-gray-400 text-[12px]'>check-out</span>
+                                <h6 className='text-[15px] mt-1'>{booking.checkIn}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div className='w-full p-4 flex flex-wrap items-center justify-evenly'>
+
+                    <div className='flex flex-col mx-2'>
+                        <label> Salutation </label>
+                        <select defaultValue={guestSalutation} onChange={(e) => setGuestSalutation(e.target.value)} name="salutation" className='border mt-1 rounded p-1'>
+                            <option value="Mr">MR</option>
+                            <option value="Ms">MS</option>
+                        </select>
+                    </div>
+
+                    <ContactForm label='full name' name='name' fieldName='fullName' setContactInfo={setGuestInfo} />
+                    <ContactForm label='email' name='email' fieldName='email' setContactInfo={setGuestInfo} />
+                    <ContactForm label='phone number' name='phone' pattern="[0-9]*" fieldName='phone'  setContactInfo={setGuestInfo} />
+
+                </div>
+
+            </div>}
 
         </div>
     </div>

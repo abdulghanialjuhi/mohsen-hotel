@@ -1,22 +1,28 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useLocation, useNavigate } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
+import { Context } from '../../context/GlobalState'
+import Profile from '../Profile'
 
 export default function Header() {
 
     const locations = useLocation()
     const navigate = useNavigate()
+    const { isAuth } = useContext(Context)
 
     const navList = [['home', '/'], ['promotions', '/promotions'], ['meetings & events', '/events'], ['gallery', '/gallery'], ['location', '/location'], ['contact us', '/contact']]
     const excludeHeader = ['secure', 'auth']
 
     return (
         <div>
-            <div className='flex align-center h-20 border-b-[1px]'>
-                <div className='flex px-8 items-center cursor-pointer' onClick={() => navigate('/')}>
+            <div className='flex align-center justify-between px-4 h-20 border-b-[1px]'>
+                <div className='flex px-4 items-center cursor-pointer' onClick={() => navigate('/')}>
                     <h1 className='text'> MK </h1>
                     <h3 className='text-xl ml-2'> Hotel </h3>
                 </div>
+
+                {isAuth && (
+                    <Profile />
+                )}
 
             </div>
             {!excludeHeader.some(el => locations.pathname.includes(el)) && (
