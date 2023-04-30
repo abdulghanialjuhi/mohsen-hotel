@@ -6,7 +6,7 @@ import { db } from '../../firebaseConfig'
 import { getCollectionData } from '../../helper/firebaseFetch';
 import { Context } from '../../context/GlobalState';
 
-export default function Table({ tableName, data, keys, handleDelete, setData, isDelete=true, isCollection=true }) {
+export default function Table({ tableName, data, keys, handleDelete, setData, isDelete=true, defaultFunc=getCollectionData }) {
 
     const [filterHistoryJobs, setFilterHistoryJobs] = useState([])
     const [loading, setLoading] = useState(true)
@@ -30,7 +30,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
     const tableId = getTableId(tableName)
 
     useEffect(() => {
-        getCollectionData(tableName, isCollection).then((res) => {
+        defaultFunc(tableName).then((res) => {
             setData(res)
             setFilterHistoryJobs(res)
         }).catch((err) => {
@@ -54,7 +54,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
         } else {
           setFilterHistoryJobs(data)
         }
-      }
+    }
     
     const handleSearching = (value) => {
         let matchData = []
@@ -130,7 +130,7 @@ const Record = ({ field, keys, handleDelete, tableName }) => {
     return (
         <div className='flex group justify-evenly relative bg-gray-200 w-full py-2 my-1 '>
             {keys.map((key) => (
-                !key.includes('password') && (<span key={key} className='w-full text-center max-w-[200px] overflow-hidden'> {field.record[key]} </span>)
+                !key.includes('password') && (<span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]} </span>)
             ))}
             {isDelete && <div className='absolute right-0 z-10 p-1 bg-gray-400 hidden group-hover:block  cursor-pointer' onClick={() => setShowModel(true)}>
                 <BsTrash color='#fff' />

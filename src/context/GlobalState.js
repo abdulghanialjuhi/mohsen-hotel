@@ -13,7 +13,8 @@ export default function GlobalState() {
     checkIn: '',
     checkOut: '',
     adult: 1,
-    children: 0
+    children: 0,
+    rooms: 1
   })
 
   const actions = (action) => {

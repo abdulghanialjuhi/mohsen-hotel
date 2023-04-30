@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { storage } from '../../firebaseConfig'
 import Table from './Table';
-import { ref, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { ref, deleteObject, uploadBytesResumable } from "firebase/storage";
 import { checkPrimaryKey, getInputType, setFormKeys } from './helper';
 import { setDataCollectionId } from '../../helper/firebaseFetch';
 
-export default function Gallery() {
+export default function FacilitiesTable() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['name', 'image'])
-    const tableName = 'gallerySections'
-    const primaryKey = 'name'
+
+    const [keys] = useState(['id', 'TV', 'bed Double', 'bed Single', 'description', 'image'])
+    const tableName = 'facilities'
+    const primaryKey = 'id'
 
     const handleDelete = (recordData) => {
         const desertRef = ref(storage, `${tableName}/${recordData.record[primaryKey]}`);
@@ -86,7 +87,7 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             dataObject['record'] = clone
             dataObject['id'] = formInput[primaryKey]
             
-            const storageRef = ref(storage, `/${tableName}/${formInput[primaryKey]}`)
+            const storageRef = ref(storage, `/${tableName}/${formInput.id}`)
             await uploadBytesResumable(storageRef, formInput['image']);
             
             setData(prevData => [...prevData, dataObject])

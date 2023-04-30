@@ -3,6 +3,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { db, auth } from '../../firebaseConfig'
 import Table from './Table';
 import { deleteUser, createUserWithEmailAndPassword } from "firebase/auth";
+import { getCollectionData } from '../../helper/firebaseFetch';
 
 export default function AdminTable() {
 
@@ -29,12 +30,12 @@ export default function AdminTable() {
     return (
         <div className='w-full h-full'>
             <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} isDelete={true} />
-            <AddDataForm keys={keys} tableName={tableName} setData={setData} />
+            <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey='email' />
         </div>
     )
 }
 
-const AddDataForm = ({ tableName, keys, setData }) => {
+export const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
 
     const [shwoForm, setShowForm] = useState(false)
     const [formInput, setFormInput] = useState({})
@@ -68,8 +69,6 @@ const AddDataForm = ({ tableName, keys, setData }) => {
         if (getInputType(key) === 'file') {
             value = e.target.files[0]
         }
-        
-        console.log('value: ', key);
 
         setFormInput(prev => ({
             ...prev,
@@ -77,6 +76,15 @@ const AddDataForm = ({ tableName, keys, setData }) => {
           }));
     }
 
+    const checkPrimaryKey = async (primaryValue) => {
+        try {
+            const res = await getCollectionData(tableName)
+            return res.some((data) => data.record[primaryKey] === primaryValue)
+        } catch (err) {
+            console.log(err);
+            return true
+        }
+    }
 
     const handleOnSubmit = async () => {
         const isNullishs = Object.values(formInput).some(value => {
@@ -89,6 +97,14 @@ const AddDataForm = ({ tableName, keys, setData }) => {
             alert('Please complete all fields')
             return
         }
+
+        const isUnique = await checkPrimaryKey(formInput[primaryKey])
+
+        if (primaryKey && isUnique) {
+            alert(`${primaryKey} must be unique`)
+            return 
+        }
+
         setFonmLoading(true)
 
         try {
@@ -109,10 +125,8 @@ const AddDataForm = ({ tableName, keys, setData }) => {
             Object.keys(obj).forEach(k => obj[k] = '');
             setFormInput(obj)
         } catch (error) {
-            // const errorCode = error.code;
-            // const errorMessage = error.message;
             console.log('error: ', error);
-            alert('error adding new admin')
+            alert(`error adding new ${tableName}`)
         } finally {
             setFonmLoading(false)
         }

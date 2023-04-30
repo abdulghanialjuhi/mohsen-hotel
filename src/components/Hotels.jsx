@@ -1,46 +1,61 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Context } from '../context/GlobalState';
-import { getRealtimeDatabaseData, getPic, getCollectionData, getCollectionDocument } from '../helper/firebaseFetch'
-import { useNavigate} from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { Context } from '../context/GlobalState'
+import { getPic, getCollectionData, getCollectionDocument } from '../helper/firebaseFetch'
+import { useNavigate } from 'react-router-dom'
+import { FaTv, FaBed } from 'react-icons/fa'
+import { BiBed } from 'react-icons/bi'
 
-export default function HotelsModal({ setShowModel }) {
+export default function Hotels() {
 
     const [data, setData] = useState([])
- 
+    const [loading, setLoading] = useState(true)
+    const { actions } = useContext(Context)
+    
+    const [searchParams] = useSearchParams();
+    const checkIn = searchParams.get('checkin')
+    const checkOut = searchParams.get('checkout')
+    const adult = parseInt(searchParams.get('adults'))
+    const children = parseInt(searchParams.get('children'))
+    const rooms = parseInt(searchParams.get('rooms'))
+    
+    const booking = { checkIn,checkOut, adult, children, rooms }
+
     useEffect(() => {
-        getRealtimeDatabaseData('rooms').then((res) => {
+        actions({type: 'SET_BOOKING', payload: booking})
+        getCollectionData('rooms').then((res) => {
+            console.log(res);
             setData(res)
         }).catch((err) => {
             console.log('err: ', err);
+        }).finally(() => {
+            setLoading(false)
         })
 
     }, [])
 
-
     return (
-        <div onClick={() => setShowModel(false)} className='fixed top-0 h-screen w-screen bg-black-rgba z-20 flex justify-center items-center p-2'>
-
-            <div onClick={(e) => e.stopPropagation()} className='max-w-[750px] w-[100%] h-[70%] bg-gray-100 rounded-lg overflow-scroll'>
-                <div className='w-full h-full flex flex-col items-center p-4'>
-                    {data.length > 0 ? data.map((room) => (
-                        <HotelRoom room={room} key={room.roomID} />
-                    )) : (
-                        <div>no rooms available at the moment</div>
-                    )}
+        <div className='h-full w-screen flex justify-center items-center p-2 mt-10 max-w-[1000px] mx-auto shadow-lg'>
+            <div className='max-w-[760px] w-full h-[70%] bg-gray-100 rounded-lg overflow-scroll'>
+                <div className='w-full flex justify-center items-center'>
+                    <h3 className='text-xl'> Available Hotels </h3>
+                </div>
+                <div className='w-full h-full flex flex-col items-center p-4 gap-8'>
+                    {loading ? 'loading' : (
+                        data.length > 0 ? data.map((room) => (
+                            <HotelRoom room={room} key={room.id} />
+                        )) : (
+                            <div>no rooms available at the moment</div>
+                        ))}
                 </div>
             </div>
-            
         </div>
     )
 }
 
-
 export const HotelRoom = (props) => {
 
     const { name, roomNumber, type, price, roomID, id, facilities, capacity } = props.room.record
-    // console.log('facilities: ', facilities);
-    // console.log('roomNumber: ', roomNumber);
-    // console.log('capacity: ', capacity);
 
     const [roomPic, setRoomPic] = useState('')
     const [available, setAvailable] = useState(true)
@@ -73,17 +88,17 @@ export const HotelRoom = (props) => {
         try {
             if (booking.adult > capacity) return setAvailable(false)
 
-            const res = await getRealtimeDatabaseData('booking')
+            const res = await getCollectionData('booking')
 
             const roomBooks = res.filter((book) => book.roomID === roomID)
-            // console.log(roomBooks);
+            console.log(roomBooks);
             if (!roomBooks.length > 0) return setAvailable(true)
 
             const fromDate = new Date(booking.checkIn.replaceAll('-', '/'))
             // const toDate = new Date(booking.checkOut.replaceAll('-', '/'))
             
             roomBooks.forEach((book) => {
-                const bookToDate = new Date(book.checkOutDate.replaceAll('-', '/'))
+                const bookToDate = new Date(book.record.checkOutDate.replaceAll('-', '/'))
                 if(bookToDate.getTime() >= fromDate.getTime()) return setAvailable(false)
             })
 
@@ -103,17 +118,17 @@ export const HotelRoom = (props) => {
     if ((booking.adult > 4 || booking.children > 4) && type === '2') return 
 
     return (
-        <div className='w-full h-[200px] p-4 border border-gray-400 my-2 rounded-sm flex justify-between items-center'> 
+        <div className='w-full h-[200px] p-4 border-[0.8px] border-gray-300 my-2 rounded-sm flex justify-between items-center'> 
             <div className='w-[250px] mx-2 flex items-center justify-center'>
                 <img src={roomPic} alt="picture here" className='w-full h-full' />
             </div>
             <div className='flex flex-col flex-grow h-full justify-center items-center'>
-                <div className='flex flex-grow flex-col w-full px-4 py-2'> 
+                <div className='flex flex-grow flex-col w-full px-4'> 
                     <ul>
-                        <li> {facilitiesData.TV} TV </li>
-                        <li> {facilitiesData.bedSingle} single bed </li>
-                        <li> {facilitiesData.bedDouble} double bed </li>
-                        <li> {facilitiesData.description} </li>
+                        {facilitiesData.TV && <li className='flex items-center gap-2'> <FaTv /> TV </li>}
+                        <li className='flex items-center gap-2'> <FaBed /> {facilitiesData.bedSingle} single bed </li>
+                        <li className='flex items-center gap-2'> <BiBed /> {facilitiesData.bedDouble} double bed </li>
+                        <li> description: {facilitiesData.description} </li>
                     </ul>
                     <h4 className='mt-auto'> ${price}/night  </h4>
                 </div>

@@ -12,8 +12,8 @@ const getErrorMessage = (error) => {
             return 'wrong-password'
         case 'Firebase: A network AuthError (such as timeout, interrupted connection or unreachable host) has occurred. (auth/network-request-failed).':
             return 'A network AuthError'
-        case 'Firebase: Error (auth/invalid-email).':
-            return 'invalid-email'
+        case 'Firebase: Error (auth/user-not-found).':
+            return 'user not found'
         default:
             return 'Error, Please Try Again';
     }
@@ -31,8 +31,6 @@ export default function Login() {
 
     const handleLogIn = (e) => {
         e.preventDefault()
-        console.log('email: ', email);
-        console.log('password: ', password);
 
         if (!email || !password) {
             setErorrMessage('Please Fill In All Fields')

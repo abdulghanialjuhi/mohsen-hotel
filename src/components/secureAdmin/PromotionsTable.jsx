@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import { collection, addDoc } from "firebase/firestore"; 
-import { db, storage } from '../../firebaseConfig'
+import { storage } from '../../firebaseConfig'
 import Table from './Table';
 import { ref, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { checkPrimaryKey, getInputType, setFormKeys } from './helper';
+import { setDataCollectionId } from '../../helper/firebaseFetch';
 
 
 export default function Promotions() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['imgName', 'percent', 'expireDate', 'promotionCode'])
+    const [keys] = useState(['promotion Code', 'image', 'percent', 'expire Date'])
     const tableName = 'promotions'
+    const primaryKey = 'promotionCode'
 
     const handleDelete = (recordData) => {
-        const desertRef = ref(storage, `promotions/${recordData.record.imgName}`);
+        const desertRef = ref(storage, `${tableName}/${recordData.record[primaryKey]}`);
         deleteObject(desertRef).then(() => {
             let cloneData = [...data]
             const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
@@ -25,41 +27,26 @@ export default function Promotions() {
     return (
         <div className='w-full h-full'>
             <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} />
-            <AddDataForm keys={keys} tableName={tableName} setData={setData} />
+            <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey={primaryKey} />
         </div>
     )
 }
 
-const AddDataForm = ({ tableName, keys, setData }) => {
+const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
 
     const [shwoForm, setShowForm] = useState(false)
     const [formInput, setFormInput] = useState({})
     const [fonmLoading, setFonmLoading] = useState(false)
 
     useEffect(() => {
-        const obj = {}
-        keys.forEach((key, i, arr) => {
-            obj[key] = ''
-            if (i === arr.length -1) setFormInput(obj)
-        })
-        
+        setFormKeys(keys).then((response) => setFormInput(response))
     }, [keys])
-
-    const getInputType = (type) => {
-        if (type.toLowerCase().includes('date')) {
-            return 'date'
-        } else if (type.toLowerCase().includes('img')) {
-            return 'file'
-        }
-        return 'text'
-    }
 
     const handleFormChange = (e, key) => {
         let value = e.target.value
         if (getInputType(key) === 'date') {
             value = value.replace('/', '-')
-        }
-        if (getInputType(key) === 'file') {
+        } else if (getInputType(key) === 'file') {
             value = e.target?.files[0]
         }
         
@@ -84,20 +71,29 @@ const AddDataForm = ({ tableName, keys, setData }) => {
         setFonmLoading(true)
 
         try {
-            const dataObject = {}
+            const isExisit = await checkPrimaryKey(formInput[primaryKey], tableName, primaryKey)
+
+            if (isExisit) {
+                alert(`${primaryKey} must be unique`)
+                return 
+            }
+
             const clone = {...formInput}
-            clone['imgName'] = formInput['imgName'].name
-
-            const addResponse = await addDoc(collection(db, tableName), clone);
-
+            clone['image'] = formInput['image'].name
+            
+            await setDataCollectionId(tableName, formInput[primaryKey], clone)
+            
+            const dataObject = {}
             dataObject['record'] = clone
-            dataObject['id'] = addResponse.id
+            dataObject['id'] = formInput[primaryKey]
+            
+            const storageRef = ref(storage, `/${tableName}/${formInput[primaryKey]}`)
+            await uploadBytesResumable(storageRef, formInput['image']);
+            
             setData(prevData => [...prevData, dataObject])
-            const storageRef = ref(storage, `/promotions/${formInput['imgName'].name}`)
-            uploadBytesResumable(storageRef, formInput['imgName']);
 
             const obj = {...formInput}
-            Object.keys(obj).forEach(k => obj[k] = '');
+            Object.keys(obj).forEach(k => obj[k.replace(' ', '')] = '');
             setFormInput(obj)
 
         } catch (error) {
@@ -115,9 +111,15 @@ const AddDataForm = ({ tableName, keys, setData }) => {
             {shwoForm && (
                 <div className='w-full mt-3 min-h-[5rem] flex flex-wrap gap-3 items-center'>
                     {keys.map((key) => (
+                        key !== 'section' &&
                         <div key={key} className='flex flex-col'>
                             <span> {key} </span>
-                            {key === 'imgName' ? (<input onChange={(e) => handleFormChange(e, key)} accept="image/png, image/jpeg" type={getInputType(key)} name={key} className='border p-2' />) : (<input value={formInput[key]} onChange={(e) => handleFormChange(e, key)} type={getInputType(key)} name={key} className='border p-2'   />)}
+                            {key.includes('image') ? ( 
+                                    <input onChange={(e) => handleFormChange(e, key.replace(' ', ''))} accept="image/png, image/jpeg" type={getInputType(key)} name={key} className='border p-2' />
+                                ) : (
+                                    <input value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
+                                )
+                            }
                         </div>
                     ))}
                     <div className='ml-auto h-full flex items-end'>

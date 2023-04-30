@@ -11,20 +11,25 @@ import Login from './components/Login';
 import CheckOut from './components/CheckOut';
 import PaymentInfo from './components/PaymentInfo';
 import Booking from './components/secureAdmin/Booking';
-import Rooms from './components/secureAdmin/Rooms';
+import Rooms from './components/secureAdmin/RoomsTable';
+import FacilitiesTable from './components/secureAdmin/FacilitiesTable';
 import PromotionsTable from './components/secureAdmin/PromotionsTable';
 import GalleryTable from './components/secureAdmin/GalleryTable';
 import GallerySections from './components/secureAdmin/GallerySections';
 import AdminTable from './components/secureAdmin/AdminTable';
 import UpdatPassword from './components/UpdatePassword';
+import Section from './components/Section';
+import Hotels from './components/Hotels';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />}/>
+      <Route path="/hotels" element={<Hotels />}/>
       <Route path="/promotions" element={<Promotions />}/>
       <Route path="/events" element={<Events />}/>
-      <Route path="/gallery" element={<Gallery />}/>
+      <Route path="/gallery" element={<Gallery />} />
+      <Route path="/gallery/:section" element={<Section />}/>
       <Route path="/location" element={<Location />}/>
       <Route path="/contact" element={<Contact />}/>
       <Route path="/check-out" element={<CheckOut />}/>
@@ -36,6 +41,7 @@ function App() {
         <Route index element={ <Booking /> } />
         <Route path="booking" element={ <Booking /> } />
         <Route path="rooms" element={<Rooms />} />
+        <Route path="facilities" element={<FacilitiesTable />} />
         <Route path="admin" element={<AdminTable />} />
         <Route path="promotions" element={<PromotionsTable />} />
         <Route path="gallery" element={<GalleryTable />} />

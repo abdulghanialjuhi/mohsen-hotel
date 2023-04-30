@@ -1,32 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { storage } from '../../firebaseConfig'
 import Table from './Table';
-import { ref, uploadBytesResumable, deleteObject } from "firebase/storage";
 import { checkPrimaryKey, getInputType, setFormKeys } from './helper';
 import { setDataCollectionId } from '../../helper/firebaseFetch';
 
-export default function Gallery() {
+export default function Rooms() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['name', 'image'])
-    const tableName = 'gallerySections'
-    const primaryKey = 'name'
+    const [keys] = useState(['room Number', 'price', 'capacity', 'facilities'])
+    const tableName = 'rooms'
 
     const handleDelete = (recordData) => {
-        const desertRef = ref(storage, `${tableName}/${recordData.record[primaryKey]}`);
-        deleteObject(desertRef).then(() => {
-            let cloneData = [...data]
-            const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
-            setData(deletedRecord)
-        }).catch((error) => {
-            console.log('error: ', error);
-        });
+        let cloneData = [...data]
+        const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
+        setData(deletedRecord)
     }
 
     return (
         <div className='w-full h-full'>
             <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} />
-            <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey={primaryKey} />
+            <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey='roomNumber' />
         </div>
     )
 }
@@ -78,7 +70,6 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             }
 
             const clone = {...formInput}
-            clone['image'] = formInput['image'].name
             
             await setDataCollectionId(tableName, formInput[primaryKey], clone)
             
@@ -86,12 +77,11 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             dataObject['record'] = clone
             dataObject['id'] = formInput[primaryKey]
             
-            const storageRef = ref(storage, `/${tableName}/${formInput[primaryKey]}`)
-            await uploadBytesResumable(storageRef, formInput['image']);
             
             setData(prevData => [...prevData, dataObject])
 
             const obj = {...formInput}
+            console.log('obj: ', obj);
             Object.keys(obj).forEach(k => obj[k.replace(' ', '')] = '');
             setFormInput(obj)
 
@@ -113,12 +103,7 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
                         key !== 'section' &&
                         <div key={key} className='flex flex-col'>
                             <span> {key} </span>
-                            {key.includes('image') ? ( 
-                                    <input onChange={(e) => handleFormChange(e, key.replace(' ', ''))} accept="image/png, image/jpeg" type={getInputType(key)} name={key} className='border p-2' />
-                                ) : (
-                                    <input value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
-                                )
-                            }
+                            <input value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
                         </div>
                     ))}
                     <div className='ml-auto h-full flex items-end'>

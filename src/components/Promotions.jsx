@@ -27,7 +27,7 @@ export default function Promotions() {
                     <div className='flex-grow flex flex-col gap-4 items-center justify-center mt-3'>
                         {promotionsData.length > 0 ? promotionsData.map((promotion, index) => (
                             <div key={index} className='relative w-full max-w-[500px] h-[500px] rounded overflow-hidden flex justify-center items-center border'>
-                                <img src={promotion} alt="room" className='h-full w-full' />
+                                <img src={promotion.img} alt="room" className='h-full w-full' />
                             </div>
                         )) : 'no images yet'}
                     </div>
