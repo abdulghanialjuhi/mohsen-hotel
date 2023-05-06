@@ -5,12 +5,12 @@ import { ref, deleteObject, uploadBytesResumable } from "firebase/storage";
 import { checkPrimaryKey, getInputType, setFormKeys } from './helper';
 import { setDataCollectionId } from '../../helper/firebaseFetch';
 
-export default function FacilitiesTable() {
+export default function RoomTypeTable() {
 
     const [data, setData] = useState([])
 
-    const [keys] = useState(['id', 'TV', 'bed Double', 'bed Single', 'description', 'image'])
-    const tableName = 'facilities'
+    const [keys] = useState(['id', 'bedType', 'description', 'image',  'TV'])
+    const tableName = 'roomType'
     const primaryKey = 'id'
 
     const handleDelete = (recordData) => {
@@ -36,6 +36,7 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
 
     const [shwoForm, setShowForm] = useState(false)
     const [formInput, setFormInput] = useState({})
+    const [selcectedSection, setSelcectedSection] = useState(false)
     const [fonmLoading, setFonmLoading] = useState(false)
 
     useEffect(() => {
@@ -48,6 +49,8 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             value = value.replace('/', '-')
         } else if (getInputType(key) === 'file') {
             value = e.target?.files[0]
+        } else if (getInputType(key) === 'checkbox') {
+            value = e.target.checked
         }
         
         setFormInput(prev => ({
@@ -102,6 +105,9 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             setFonmLoading(false)
         }
     }
+    const handleSelctSection = (e) => {
+        setSelcectedSection(e.target.value)
+    }
 
     return (
         <div className='mt-5 py-2 w-full min-h-12 flex flex-col justify-start'>
@@ -111,7 +117,7 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             {shwoForm && (
                 <div className='w-full mt-3 min-h-[5rem] flex flex-wrap gap-3 items-center'>
                     {keys.map((key) => (
-                        key !== 'section' &&
+                        !key.includes('bedType') || !key.includes('TV') &&
                         <div key={key} className='flex flex-col'>
                             <span> {key} </span>
                             {key.includes('image') ? ( 
@@ -122,6 +128,14 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
                             }
                         </div>
                     ))}
+                    <div className='flex flex-col'>
+                         <span> Section </span>
+                         <select onChange={handleSelctSection} value={selcectedSection} name="sections">
+                            <option value="" disabled hidden>Choose section</option>
+                            <option className='border p-2' value='double'>double</option>
+                            <option className='border p-2' value='single'>single</option>
+                         </select>
+                     </div>
                     <div className='ml-auto h-full flex items-end'>
                         <button disabled={fonmLoading} className='py-2 px-3 bg-primaryBlue text-gray-0 rounded' onClick={handleOnSubmit}>{fonmLoading ? 'adding...' : 'submit'}</button>
                     </div>

@@ -31,6 +31,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
 
     useEffect(() => {
         defaultFunc(tableName).then((res) => {
+            console.log(res);
             setData(res)
             setFilterHistoryJobs(res)
         }).catch((err) => {
@@ -107,15 +108,18 @@ const Record = ({ field, keys, handleDelete, tableName }) => {
 
     const [showModel, setShowModel] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
-    const  { user } = useContext(Context)
 
     const handleDeleteRecord = async () => {
         setDeleteLoading(true)
         console.log('record: ', field);
 
         try {
-            await deleteDoc(doc(db, tableName, field.id));
-            await handleDelete(field)
+            if (tableName === 'admin') {
+                await handleDelete(field)
+            } else {
+                await deleteDoc(doc(db, tableName, field.id));
+                await handleDelete(field)
+            }
         } catch (error) {
             console.log('error: ', error);
         } finally {
@@ -124,17 +128,16 @@ const Record = ({ field, keys, handleDelete, tableName }) => {
         }
     }
 
-    const isDelete = tableName === 'admin' ? field.record?.userUID === user : true
-    // console.log('isDelete: ', isDelete, ' ', field,  user);
+    // console.log(true.);
 
     return (
         <div className='flex group justify-evenly relative bg-gray-200 w-full py-2 my-1 '>
             {keys.map((key) => (
-                !key.includes('password') && (<span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]} </span>)
+                !key.includes('password') && (<span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]?.toString()} </span>)
             ))}
-            {isDelete && <div className='absolute right-0 z-10 p-1 bg-gray-400 hidden group-hover:block  cursor-pointer' onClick={() => setShowModel(true)}>
+            <div className='absolute right-0 z-10 p-1 bg-gray-400 hidden group-hover:block  cursor-pointer' onClick={() => setShowModel(true)}>
                 <BsTrash color='#fff' />
-            </div>}
+            </div>
             {showModel && <AlertModel handleDelete={handleDelete} tableName={tableName} setShowModel={setShowModel} onClick={handleDeleteRecord} deleteLoading={deleteLoading} />}
         </div>
     )

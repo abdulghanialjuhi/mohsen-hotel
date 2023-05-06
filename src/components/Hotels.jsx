@@ -55,7 +55,7 @@ export default function Hotels() {
 
 export const HotelRoom = (props) => {
 
-    const { name, roomNumber, type, price, roomID, id, facilities, capacity } = props.room.record
+    const { name, roomNumber, type, price, roomID, id, roomType, capacity } = props.room.record
 
     const [roomPic, setRoomPic] = useState('')
     const [available, setAvailable] = useState(true)
@@ -66,7 +66,7 @@ export const HotelRoom = (props) => {
     useEffect(() => {
         checkAvailability()
 
-        getCollectionDocument(`facilities`, facilities)
+        getCollectionDocument(`roomType`, roomType)
         .then((res) => {
             // console.log(res);
             setFacilitiesData(res)
@@ -75,13 +75,13 @@ export const HotelRoom = (props) => {
             setFacilitiesData({TV: 'undefind', bedDouble: 'undefind', bedSingle: 'undefind', description: 'undefind'})
         })
 
-        getPic(`facilities/${facilities}`)
+        getPic(`roomType/${roomType}`)
         .then((res) => {
             setRoomPic(res);
         }).catch((err) => {
             console.log(err);
         })
-    })
+    }, [])
     
     const checkAvailability = async () => {
 

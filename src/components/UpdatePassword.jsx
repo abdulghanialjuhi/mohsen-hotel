@@ -56,7 +56,7 @@ export default function UpdatPassword() {
     
     return (
         <div className='flex-grow flex justify-center items-center'>
-            <div className='w-full max-w-[650px] min-h-[430px] border border-gray-200 rounded flex flex-col items-center p-3'>
+            <div className='w-full max-w-[650px] min-h-[430px] border mt-8 border-gray-200 rounded flex flex-col items-center p-3'>
                 <h2 className='mb-2'> Update password </h2>
                 <div className='min-h-[1rem] mt-2'>
                     {erorrMessage.text && <span className={`h-full  p-1 rounded-md text-gray-100 ${erorrMessage.status === 'danger' ? 'bg-red-500' : 'bg-green-500'}`}> {erorrMessage.text} </span>}

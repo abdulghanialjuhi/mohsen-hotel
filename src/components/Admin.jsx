@@ -3,7 +3,7 @@ import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 
 export default function Admin() {
 
-    const tables = [{tableName: 'booking', id: 'email'}, {tableName: 'rooms', id: 'name'}, {tableName: 'facilities', id: 'pictureID'}, {tableName: 'admin', id: 'adminID'}, {tableName: 'promotions', id: 'promotionCode'}, {tableName: 'gallery', id: 'pictureID'}, {tableName: 'gallery sections', id: 'pictureID'}]
+    const tables = [{tableName: 'booking', id: 'email'}, {tableName: 'rooms', id: 'name'}, {tableName: 'room type', id: 'pictureID'}, {tableName: 'admin', id: 'adminID'}, {tableName: 'users', id: 'email'}, {tableName: 'promotions', id: 'promotionCode'}, {tableName: 'gallery', id: 'pictureID'}, {tableName: 'gallery sections', id: 'pictureID'}]
 
     const locations = useLocation()
     const navigate = useNavigate()

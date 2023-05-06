@@ -8,6 +8,7 @@ export default function GlobalState() {
 
   const [loading, setLoading] = useState(true)
   const [isAuth, setIsAuth] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [user, setUser] = useState(null)
   const [booking, setBooking] = useState({
     checkIn: '',
@@ -36,8 +37,11 @@ export default function GlobalState() {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      // console.log('user: ', user);
       if (user) {
+        const isAdmin = user.reloadUserInfo?.customAttributes
+        if (isAdmin) {
+          setIsAdmin(true)
+        }
         setUser(user.uid)
         setIsAuth(true)
       } 
@@ -46,5 +50,5 @@ export default function GlobalState() {
 
   }, [])
 
-  return { actions, loading, booking, isAuth, user }
+  return { actions, loading, booking, isAuth, user, isAdmin }
 }

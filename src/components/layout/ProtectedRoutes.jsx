@@ -4,12 +4,19 @@ import { Context } from "../../context/GlobalState";
 
 export const ProtectedRoute = ({ children }) => {
 
-    const { isAuth } = useContext(Context)
+    const { isAuth, isAdmin } = useContext(Context)
     const locations = useLocation()
-    
-    if (!isAuth && locations.pathname.includes('secure')) {
-        console.log('not auth');
-      return <Navigate to="/auth-login" replace />;
+
+    if (isAuth && (locations.pathname.includes('login') || locations.pathname.includes('signup'))) {
+      	return <Navigate to="/" replace />;
+    }
+
+	if (!isAdmin && locations.pathname.includes('secure')) {
+		return <Navigate to="/" replace />;
+  	}
+
+    if (!isAuth && locations.pathname.includes('auth')) {
+    	return <Navigate to="/login" replace />;
     }
   
     return children;

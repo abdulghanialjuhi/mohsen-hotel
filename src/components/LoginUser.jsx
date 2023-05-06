@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import React, { useContext, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Context } from '../context/GlobalState'
 import { auth } from '../firebaseConfig'
 
@@ -19,7 +19,7 @@ const getErrorMessage = (error) => {
     }
 }
 
-export default function Login() {
+export default function LoginUser() {
 
     const [email, setEmail] = useState('')
     const [erorrMessage, setErorrMessage] = useState('')
@@ -37,9 +37,13 @@ export default function Login() {
             setTimeout(() => setErorrMessage(''), 1500)
             return false
         }
+    
         setLoading(true)
-        signInWithEmailAndPassword(auth, email, password)
+        const fixedEmail = email.split(' ')[0]
+    
+        signInWithEmailAndPassword(auth, fixedEmail, password)
         .then(async(userCredential) => {
+            // Signed in 
             const user = userCredential.user;
             if (user) {
                 console.log(user);
@@ -62,12 +66,12 @@ export default function Login() {
     
     return (
         <div className='flex-grow flex justify-center items-center'>
-            <div className='w-full max-w-[650px] min-h-[430px] border mt-8 border-gray-200 rounded flex flex-col items-center p-3'>
+            <div className='w-full max-w-[650px] min-h-[430px] border border-gray-200 rounded flex flex-col items-center p-3'>
                 <h2 className='mb-2'> Login </h2>
                 <div className='min-h-[1rem] mt-2 flex justify-center max-w-[450px]'>
                     {erorrMessage && <span className='h-full bg-red-500 py-1 text-center px-2 rounded-md text-gray-100'> {erorrMessage} </span>}
                 </div>
-                <div className='w-full h-full flex flex-col justify-center items-center'>
+                <div className='w-full h-full flex justify-center items-center'>
                     <form onSubmit={handleLogIn} className='w-full h-full'>
                         <div className='w-full max-w-[350px] mx-auto mt-4 flex flex-col gap-5'>
                             <div className='flex flex-col w-full'>
@@ -83,10 +87,6 @@ export default function Login() {
                             </div>
                         </div>
                     </form>
-                    <div className='flex justify-center items-center mt-5 gap-2'>   
-                        <p className=''>Don't have an account? </p>
-                        <Link className='text-primaryBlue' to='/signup'> Signup </Link> 
-                    </div>
                 </div>
             </div>
         </div>

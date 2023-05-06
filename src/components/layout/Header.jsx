@@ -9,7 +9,7 @@ export default function Header() {
     const navigate = useNavigate()
     const { isAuth } = useContext(Context)
 
-    const navList = [['home', '/'], ['promotions', '/promotions'], ['meetings & events', '/events'], ['gallery', '/gallery'], ['location', '/location'], ['contact us', '/contact']]
+    const navList = [['home', '/'], ['promotions', '/promotions'], ['gallery', '/gallery'], ['location', '/location'], ['contact us', '/contact']]
     const excludeHeader = ['secure', 'auth']
 
     return (
@@ -20,8 +20,12 @@ export default function Header() {
                     <h3 className='text-xl ml-2'> Hotel </h3>
                 </div>
 
-                {isAuth && (
+                {isAuth ? (
                     <Profile />
+                ) : (
+                    <div className='flex justify-center items-center mr-5'>
+                        <Link to='/login' className='text-primaryBlue font-bold'> Login </Link>
+                    </div>
                 )}
 
             </div>

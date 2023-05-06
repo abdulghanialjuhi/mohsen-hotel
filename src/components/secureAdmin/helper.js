@@ -18,6 +18,8 @@ export const getInputType = (type) => {
         return 'date'
     } else if (type.toLowerCase().includes('image')) {
         return 'file'
+    } else if (type.toLowerCase().includes('tv')) {
+        return 'checkbox'
     }
     return 'text'
 }

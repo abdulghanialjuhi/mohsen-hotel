@@ -3,11 +3,11 @@ import Table from './Table';
 import axios from 'axios'
 import { Context } from '../../context/GlobalState';
 
-export default function AdminTable() {
+export default function UsersTable() {
 
     const [data, setData] = useState([])
     const [keys] = useState(['name', 'email', 'password'])
-    const tableName = 'admin'
+    const tableName = 'user'
     const { user } = useContext(Context)
 
     const handleDelete = async (recordData)  => {
@@ -27,7 +27,7 @@ export default function AdminTable() {
 
     const getAllUsers = async () => {
         try {
-            const res = await axios.get("http://localhost:8000/get-admins")
+            const res = await axios.get("http://localhost:8000/get-users")
             return res.data.users
         } catch (err) {
             console.log(err);
@@ -99,7 +99,7 @@ export const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
 
         try {
             const dataObject = {}
-            const res = await axios.post("http://localhost:8000/add-admin", {'name': formInput.name, 'email': formInput.email, 'password': formInput.password})
+            const res = await axios.post("http://localhost:8000/add-user", {'name': formInput.name, 'email': formInput.email, 'password': formInput.password})
             console.log('res: ', res);
 
             dataObject['record'] = formInput
