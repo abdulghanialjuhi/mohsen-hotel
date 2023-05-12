@@ -11,11 +11,11 @@ export const ProtectedRoute = ({ children }) => {
       	return <Navigate to="/" replace />;
     }
 
-	if (!isAdmin && locations.pathname.includes('secure')) {
-		return <Navigate to="/" replace />;
+    if (!isAdmin && locations.pathname.includes('secure')) {
+        return <Navigate to="/" replace />;
   	}
 
-    if (!isAuth && locations.pathname.includes('auth')) {
+    if ((!isAuth || isAdmin) && locations.pathname.includes('auth')) {
     	return <Navigate to="/login" replace />;
     }
   

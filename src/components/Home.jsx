@@ -7,7 +7,7 @@ export default function Home() {
   const [showModel, setShowModel] = useState(false)
 
   return (
-    <div className='flex-grow relative flex mx-[-2rem]'>
+    <div className='flex-grow relative flex mx-[-2rem] min-h-[650px]'>
         <div className='absolute top-0 w-full h-full'>
             <img src='panner.jpg' alt="panner" className='w-full h-full' />
         </div>

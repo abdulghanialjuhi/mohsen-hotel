@@ -1,31 +1,98 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Table from './Table';
+import { getCollectionDatWithId, updateDataCollectionId } from '../../helper/firebaseFetch';
+import ModalForm from './ModalForm';
 
 export default function Booking() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['full Name', 'room Number', 'checkIn Date', 'checkOut Date', 'email', 'phone',  'total'])
+    const [keys] = useState(['id', 'room Number', 'guest Name', 'checkIn Date', 'checkOut Date', 'total', 'status'])
     const tableName = 'booking'
+    const [shwoForm, setShowForm] = useState(false)
+    const [record, setRecord] = useState({})
 
     const handleDelete = async (recordData) => {
-
-        // try {
-        //     await deleteDoc(doc(db, tableName, recordData.id));
-        // } catch (error) {
-        //     console.log('error: ', error);
-        // } finally {
-        //     setDeleteLoading(false)
-        //     setShowModel(false)
-        // }
-
         let cloneData = [...data]
         const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
         setData(deletedRecord)
     }
 
+    const getIDs = async() => {
+        const res = await getCollectionDatWithId('booking')
+        console.log(res);
+
+        return res
+    }
+
+    const handleEditRecord = (field) => {
+        setShowForm(true)
+        setRecord(field)
+    }
+
     return (
         <div className='w-full h-full'>
-            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} />
+            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} defaultFunc={getIDs} handleEditRecord={handleEditRecord} editable={true} />
+            <AddDataForm shwoForm={shwoForm} setShowForm={setShowForm} keys={keys} tableName={tableName} setData={setData} primaryKey='id' record={record} />
+        </div>
+    )
+}
+
+const AddDataForm = ({ tableName, shwoForm, setShowForm, record }) => {
+
+    const [selcectedSection, setSelcectedSection] = useState('pending')
+    const [fonmLoading, setFonmLoading] = useState(false)
+
+    useEffect(() => {
+        if (record) {
+            setSelcectedSection(record?.record?.status)
+        }
+    }, [record])
+
+    const handleOnSubmit = async () => {
+        setFonmLoading(true)
+
+        try {
+
+            await updateDataCollectionId(tableName, record.id, {status: selcectedSection})
+            
+            // setData(prevData => {
+            //     prevData.map((data) => data.id === record.id)
+            // })
+
+            setShowForm(false)
+        } catch (error) {
+            console.log('error: ', error);
+        } finally {
+            setFonmLoading(false)
+        }
+    }
+    const handleSelctSection = (e) => {
+        setSelcectedSection(e.target.value)
+    }
+
+    return (
+        <div className='mt-5 py-2 w-full min-h-12 flex flex-col justify-start'>
+        {shwoForm && (
+            <ModalForm setShowModel={setShowForm}>
+                <div className='w-full mt-3 h-full flex flex-col gap-3 items-center'>
+                    <h3> Update {tableName} </h3>
+                    <div className='flex mt-2 flex-wrap flex-grow justify-center gap-3'>
+                        <div className='flex flex-col'>
+                            <span> Status </span>
+                            <select className='p-2' onChange={handleSelctSection} value={selcectedSection} name="status">
+                                <option className='border p-2' value='pending'>pending</option>
+                                <option className='border p-2' value='paid'>paid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className='mt-auto flex w-full justify-end gap-4'>
+                        <button disabled={fonmLoading} className='py-2 px-3 bg-red-600 text-gray-0 rounded' onClick={() => setShowForm(false)}>Cancel</button>
+                        <button disabled={fonmLoading} className='py-2 px-3 bg-primaryBlue text-gray-0 rounded' onClick={handleOnSubmit}>{fonmLoading ? 'adding...' : 'submit'}</button>
+                    </div>
+                </div>
+            </ModalForm>
+        )}
         </div>
     )
 }

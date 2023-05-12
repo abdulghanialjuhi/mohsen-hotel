@@ -6,7 +6,7 @@ import { setDataCollectionId } from '../../helper/firebaseFetch';
 export default function Rooms() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['name', 'room Number', 'price', 'capacity', 'roomType'])
+    const [keys] = useState(['name', 'room Number', 'price', 'roomType'])
     const tableName = 'rooms'
 
     const handleDelete = (recordData) => {

@@ -3,54 +3,46 @@ import { storage } from '../../firebaseConfig'
 import Table from './Table';
 import { ref, deleteObject, uploadBytesResumable } from "firebase/storage";
 import { checkPrimaryKey, getInputType, setFormKeys } from './helper';
-import { deleteImages, setDataCollectionId } from '../../helper/firebaseFetch';
+import { setDataCollectionId } from '../../helper/firebaseFetch';
 import ModalForm from './ModalForm';
 
-export default function RoomTypeTable() {
+export default function RoomItemTable() {
 
     const [data, setData] = useState([])
 
-    const [keys] = useState(['id', 'bed Type', 'description', 'capacity', 'image'])
-    const [recrodData, setRecrodData] = useState({})
-    const [shwoForm, setShowForm] = useState(false)
-
-    const tableName = 'roomType'
+    const [keys] = useState(['item'])
+    const tableName = 'roomItem'
     const primaryKey = 'id'
 
     const handleDelete = (recordData) => {
-        deleteImages(`${tableName}/${recordData.record[primaryKey]}`)
-        .then((res) => {
-            console.log(res);
+        const desertRef = ref(storage, `${tableName}/${recordData.record[primaryKey]}`);
+        deleteObject(desertRef).then(() => {
             let cloneData = [...data]
             const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
             setData(deletedRecord)
-        }).catch((err) => {
-            console.log(err);
-        })
-    }
-
-    const handleEditRecord = (field) => {
-        setRecrodData(field)
-        setShowForm(true)
+        }).catch((error) => {
+            console.log('error: ', error);
+        });
     }
 
     return (
         <div className='w-full h-full'>
-            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} handleEditRecord={handleEditRecord} />
-            <AddDataForm recrodData={recrodData} setShowForm={setShowForm} shwoForm={shwoForm} keys={keys} tableName={tableName} setData={setData} primaryKey={primaryKey} />
+            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} />
+            <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey={primaryKey} />
         </div>
     )
 }
 
-const AddDataForm = ({ recrodData, tableName, keys, setData, primaryKey, shwoForm, setShowForm }) => {
+const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
 
+    const [shwoForm, setShowForm] = useState(false)
     const [formInput, setFormInput] = useState({})
     const [selcectedSection, setSelcectedSection] = useState('')
     const [fonmLoading, setFonmLoading] = useState(false)
 
     useEffect(() => {
         setFormKeys(keys).then((response) => {
-            console.log(response);
+            response['TV'] = false
             setFormInput(response)
         })
     }, [keys])
@@ -60,7 +52,7 @@ const AddDataForm = ({ recrodData, tableName, keys, setData, primaryKey, shwoFor
         if (getInputType(key) === 'date') {
             value = value.replace('/', '-')
         } else if (getInputType(key) === 'file') {
-            value = e.target?.files
+            value = e.target?.files[0]
         } else if (getInputType(key) === 'checkbox') {
             value = e.target.checked
         }
@@ -95,7 +87,7 @@ const AddDataForm = ({ recrodData, tableName, keys, setData, primaryKey, shwoFor
             }
 
             const clone = {...formInput}
-            clone['image'] = formInput.id
+            clone['image'] = formInput['image'].name
             clone['bedType'] = selcectedSection
             
             await setDataCollectionId(tableName, formInput[primaryKey], clone)
@@ -104,12 +96,8 @@ const AddDataForm = ({ recrodData, tableName, keys, setData, primaryKey, shwoFor
             dataObject['record'] = clone
             dataObject['id'] = formInput[primaryKey]
             
-            console.log(formInput.image);
-            for (let img of formInput.image) {
-                console.log('img: ', img);
-                const storageRef = ref(storage, `/${tableName}/${formInput.id}/${img.name}`)
-                await uploadBytesResumable(storageRef, img);
-            }
+            const storageRef = ref(storage, `/${tableName}/${formInput.id}`)
+            await uploadBytesResumable(storageRef, formInput['image']);
             
             setData(prevData => [...prevData, dataObject])
 
@@ -143,24 +131,13 @@ const AddDataForm = ({ recrodData, tableName, keys, setData, primaryKey, shwoFor
                                 <div key={key} className='flex flex-col'>
                                     <span> {key} </span>
                                     {key.includes('image') ? ( 
-                                        <>
-                                            <input onChange={(e) => handleFormChange(e, key.replace(' ', ''))} accept="image/png, image/jpeg" type={getInputType(key)} name={key} className='border p-2' multiple/>
-                                            <span className='text-[10px]'>  To select multiple files, hold down the CTRL or SHIFT key while selecting</span>
-                                        </>
+                                            <input onChange={(e) => handleFormChange(e, key.replace(' ', ''))} accept="image/png, image/jpeg" type={getInputType(key)} name={key} className='border p-2' />
                                         ) : (
                                             <input value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
                                         )
                                     }
                                 </div>
                             ))}
-                            <div className='flex flex-col'>
-                                <span> Bed type </span>
-                                <select className='p-2' onChange={handleSelctSection} value={selcectedSection} name="sections">
-                                    <option value="" disabled hidden>Choose bed type</option>
-                                    <option className='border p-2' value='single'>single</option>
-                                    <option className='border p-2' value='double'>double</option>
-                                </select>
-                            </div>
                         </div>
 
                         <div className='mt-auto flex w-full justify-end gap-4'>

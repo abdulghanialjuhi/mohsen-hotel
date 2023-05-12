@@ -1,50 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Context } from '../context/GlobalState'
-import { Link } from 'react-router-dom'
+import React from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 export default function PaymentInfo() {
 
-    const { booking } = useContext(Context) 
-    const [loading, setLoading] = useState(true)
-
-    const isNullishs = Object.values(booking).some(value => {
-        if (value === null || value === '') {
-        return true;
-        }
-    
-        return false;
-    });
-
-    useEffect(() => {
-        if (isNullishs) {
-           alert('error')
-        } else {
-            setLoading(false)
-        }
-      
-    }, [])
-
-    const getNights = () => {
-        const fromDate = new Date(booking.checkIn.replaceAll('-', '/'))
-        const toDate = new Date(booking.checkOut.replaceAll('-', '/'))
-    
-        const difference = toDate.getTime() - fromDate.getTime();
-        const TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
-        return TotalDays
-    } 
-
-
-    if (loading) {
-        return (
-            <div className='flex flex-col'>
-                <h1>Error</h1>
-                <Link to='/'>
-                    <h2 className='text-[blue]'> return to home page </h2> 
-                </Link>
-            </div>
-        
-        )
-    }
+    const [searchParams] = useSearchParams();
+    const total = searchParams.get('total')
 
     return (
         <div className='flex-grow flex mt-4 p-3 items-center justify-center'>
@@ -56,8 +16,8 @@ export default function PaymentInfo() {
                     <div className='flex flex-grow flex-col  mt-8 gap-4'>
                         <span>name: Mohsen</span>
                         <span>bank: maybank</span>
-                        <span>account number: XXXXXXXXXX</span>
-                        <span>total: {booking.room.price * getNights()}</span>
+                        <span>account number: 112148308546</span>
+                        <span>total: {total} </span>
 
                     </div>
                 </div>

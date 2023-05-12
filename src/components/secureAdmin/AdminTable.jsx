@@ -36,7 +36,7 @@ export default function AdminTable() {
 
     return (
         <div className='w-full h-full'>
-            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} isDelete={false} defaultFunc={getAllUsers} />
+            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} defaultFunc={getAllUsers} />
             <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey='email' />
         </div>
     )

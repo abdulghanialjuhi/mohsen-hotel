@@ -4,37 +4,23 @@ import axios from 'axios'
 import { Context } from '../../context/GlobalState';
 import { getRealtimeDatabaseData, setRealtimeDatabaseData } from '../../helper/firebaseFetch';
 
-export default function UsersTable() {
+export default function GuestTable() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['name', 'email', 'password', 'phone'])
-    const tableName = 'users'
+    const [keys] = useState(['name', 'email', 'password', 'phone', 'adult', 'children'])
+    const tableName = 'guest'
     const { user } = useContext(Context)
 
     const handleDelete = async (recordData)  => {
-        try {
-            const res = await axios.post("http://localhost:8000/delete-user", {'uid': recordData.id})
-            if (recordData.id === user) {
-                window.location.reload()
-            }
-            let cloneData = [...data]
-            const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
-            setData(deletedRecord)
-        } catch (err) {
-            console.log(err);
-            alert('Error: something went wrong')
-        }
-    }
-
-    const getAllUsers = async () => {
-        const usersData = await getRealtimeDatabaseData('users')
-        return usersData
+        let cloneData = [...data]
+        const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
+        setData(deletedRecord)
     }
 
     return (
         <div className='w-full h-full'>
-            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} defaultFunc={getAllUsers} />
-            <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey='email' />
+            <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} />
+            {/* <AddDataForm keys={keys} tableName={tableName} setData={setData} primaryKey='email' /> */}
         </div>
     )
 }

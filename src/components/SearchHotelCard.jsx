@@ -12,7 +12,11 @@ export default function SearchHotelCard() {
     const handleOnSubmit = () => {
         if (booking.checkIn && booking.checkOut && booking.checkOut > booking.checkIn) {
         // setShowModel(true)
-            navigate(`/hotels?checkin=${booking.checkIn}&checkout=${booking.checkOut}&adults=${booking.adult}&children=${booking.children}&rooms=${booking.rooms}`)
+        navigate({
+            pathname: '/hotels',
+            search: `?checkin=${booking.checkIn}&checkout=${booking.checkOut}&adults=${booking.adult}&children=${booking.children}&rooms=${booking.rooms}`,
+          });
+            // navigate(`/hotels?checkin=${booking.checkIn}&checkout=${booking.checkOut}&adults=${booking.adult}&children=${booking.children}&rooms=${booking.rooms}`)
         } else {
             alert('Please choose valid dates')
         }
@@ -103,11 +107,6 @@ export default function SearchHotelCard() {
                     </div>
 
                 </div>
-
-            {/* <div className='flex w-full mt-8'>
-                <input className='w-full p-2 rounded outline-none' type="text" name="promotion" placeholder='Discount Code' />
-                <button className='px-4 bg-primaryBlue rounded ml-[-10px] text-gray-0 hover:bg-[#1162be]'>Apply</button>
-            </div> */}
 
                 <div className='flex w-full mt-8 justify-end'>
                     <button onClick={handleOnSubmit} className='py-2 px-3 bg-[#8f3237] rounded text-gray-0 hover:bg-[#77282c]'>Check Availability</button>

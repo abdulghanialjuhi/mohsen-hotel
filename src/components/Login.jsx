@@ -62,7 +62,7 @@ export default function Login() {
     
     return (
         <div className='flex-grow flex justify-center items-center'>
-            <div className='w-full max-w-[650px] min-h-[430px] border mt-8 border-gray-200 rounded flex flex-col items-center p-3'>
+            <div className='w-full max-w-[650px] min-h-[430px] shadow my-8 bg-gray-0 rounded flex flex-col items-center p-3'>
                 <h2 className='mb-2'> Login </h2>
                 <div className='min-h-[1rem] mt-2 flex justify-center max-w-[450px]'>
                     {erorrMessage && <span className='h-full bg-red-500 py-1 text-center px-2 rounded-md text-gray-100'> {erorrMessage} </span>}
@@ -79,7 +79,7 @@ export default function Login() {
                                 <input value={password} type='password' onChange={(e) => setPassword(e.target.value)} className='border p-1 rounded' />
                             </div>
                             <div className='flex mt-4 justify-end'>    
-                                <input disabled={loading} type="submit" name="submit" className='p-2 px-3 rounded bg-primaryBlue text-gray-0 cursor-pointer' value={loading ? 'login...' : 'Submit'} />
+                                <input disabled={loading} type="submit" name="submit" className='p-2 px-3 rounded bg-primaryBlue text-gray-0 cursor-pointer w-full' value={loading ? 'login...' : 'Submit'} />
                             </div>
                         </div>
                     </form>

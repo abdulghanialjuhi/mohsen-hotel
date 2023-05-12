@@ -18,16 +18,22 @@ import GalleryTable from './components/secureAdmin/GalleryTable';
 import GallerySections from './components/secureAdmin/GallerySections';
 import AdminTable from './components/secureAdmin/AdminTable';
 import UsersTable from './components/secureAdmin/UsersTable';
-import UpdatPassword from './components/UpdatePassword';
+import UpdatProfile from './components/UpdatProfile';
 import Section from './components/Section';
 import Hotels from './components/Hotels';
 import SignUp from './components/SignUp';
+import MyBooking from './components/MyBooking';
+import MyProfile from './components/MyProfile';
+import RoomItemTable from './components/secureAdmin/RoomItem';
+import RoomDetails from './components/RoomDetails';
+import GuestTable from './components/secureAdmin/GuestTable';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />}/>
       <Route path="/hotels" element={<Hotels />}/>
+      <Route path="/hotels/roomNumber" element={<RoomDetails />}/>
       <Route path="/promotions" element={<Promotions />}/>
       <Route path="/signup" element={<SignUp />}/>
       <Route path="/gallery" element={<Gallery />} />
@@ -37,7 +43,13 @@ function App() {
       <Route path="/check-out" element={<CheckOut />}/>
       <Route path="/payment-information" element={<PaymentInfo />} />
       <Route path="/login" element={<Login />}/>
-      <Route path="/auth-update-password" element={<UpdatPassword />}/>
+      {/* <Route path="/auth-update-password" element={<UpdatPassword />}/> */}
+
+      <Route path="/auth-my-profile/:uid" element={<MyProfile />}>
+        <Route index element={ <MyBooking /> } />
+        <Route path="my-booking" element={<MyBooking />}/>
+        <Route path="update-profile" element={<UpdatProfile />}/>
+      </Route>
       
       <Route path="/secure-admin" element={ <Admin /> }>
         <Route index element={ <Booking /> } />
@@ -49,6 +61,8 @@ function App() {
         <Route path="promotions" element={<PromotionsTable />} />
         <Route path="gallery" element={<GalleryTable />} />
         <Route path="gallery-sections" element={<GallerySections />} />
+        <Route path="room-item" element={<RoomItemTable />} />
+        <Route path="guest" element={<GuestTable />} />
       </Route>
 
     </Routes>

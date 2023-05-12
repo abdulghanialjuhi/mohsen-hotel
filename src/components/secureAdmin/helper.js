@@ -5,7 +5,7 @@ export const setFormKeys = (keys) => {
     return new Promise((resolve, reject) => {
         const obj = {}
         keys.forEach((key, i, arr) => {
-            if (key !== 'section') {
+            if (key !== 'section' && key !== 'bed Type') {
                 obj[key.replace(' ', '')] = ''
             }
             if (i === arr.length -1) resolve(obj)
