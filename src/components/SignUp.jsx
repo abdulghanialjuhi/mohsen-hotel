@@ -13,6 +13,8 @@ const getErrorMessage = (error) => {
             return 'A network AuthError'
         case 'Firebase: Error (auth/user-not-found).':
             return 'user not found'
+        case 'Firebase: Error (auth/invalid-email).':
+            return 'invalid email'
         default:
             return 'Error, Please Try Again';
     }

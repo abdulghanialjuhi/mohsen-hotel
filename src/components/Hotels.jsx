@@ -4,7 +4,7 @@ import { Context } from '../context/GlobalState'
 import { getCollectionData, getCollectionDocument, getImages } from '../helper/firebaseFetch'
 import { useNavigate } from 'react-router-dom'
 import { FaTv, FaBed } from 'react-icons/fa'
-import { BiBed } from 'react-icons/bi'
+import { BiBed, BiMinus, BiPlus } from 'react-icons/bi'
 import { MdIron, MdShower, MdOutlineAir } from 'react-icons/md'
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai'
 import { Slide } from 'react-slideshow-image';
@@ -14,9 +14,10 @@ import 'react-slideshow-image/dist/styles.css'
 export default function Hotels() {
 
     const [data, setData] = useState([])
+    const [allRooms, setAllRooms] = useState([])
     const [loading, setLoading] = useState(true)
     const [slectedRoomNumber, setSlectedRoomNumber] = useState([])
-    const { actions } = useContext(Context)
+    const { actions, user, isAdmin } = useContext(Context)
     
     const [searchParams] = useSearchParams();
     const checkIn = searchParams.get('checkin')
@@ -27,10 +28,15 @@ export default function Hotels() {
     const navigate = useNavigate()
     const booking = { checkIn,checkOut, adult, children, rooms }
 
+
+    // useEffect(() => console.log(allRooms), [allRooms])
+
     useEffect(() => {
         actions({type: 'SET_BOOKING', payload: booking})
         getCollectionData('rooms').then((res) => {
-            setData(res)
+            setAllRooms(res);
+            const arrayUniqueByKey = [...new Map(res.map(item => [item.record.roomType, item])).values()];
+            setData(arrayUniqueByKey)
         }).catch((err) => {
             console.log('err: ', err);
         }).finally(() => {
@@ -40,8 +46,54 @@ export default function Hotels() {
     }, [])
     
     const handleOnClick = () => {
+        if (!user || isAdmin) {
+            alert('you have to login first to checkout')
+            return false
+        }
         actions({type: 'SET_BOOKING', payload: {...booking, room: slectedRoomNumber}})
         navigate('/check-out')
+    }
+
+    const checkAvailability = async (room) => {
+        if (room.checked) return false
+
+        try {
+
+            const res = await getCollectionData('booking')
+
+            const convertedList = convertRoomsToArr(res)
+            const roomBooks = convertedList.filter((book) => book.record.roomNumber.includes(room.record.roomNumber))
+            if (!roomBooks.length > 0) return true
+
+            const fromDate = new Date(booking.checkIn.replaceAll('-', '/'))
+            
+            roomBooks.forEach((book) => {
+                const bookToDate = new Date(book.record.checkOutDate.replaceAll('-', '/'))
+                if(bookToDate.getTime() >= fromDate.getTime()) return false
+            })
+
+        } catch (err) {
+            console.log(err);
+            return false
+        }
+
+    }
+
+    // useEffect(() => console.log('slectedRoomNumber: ', slectedRoomNumber), [slectedRoomNumber])
+
+
+    const hndleAddNewRoomChecker = async (type) => {
+
+        const roomType = allRooms.filter((room) => room.record.roomType === type)
+        const roomsAvalible = []
+        await Promise.all(roomType.map(async (item) => {
+            const res = await checkAvailability(item)
+            if (res) {
+                roomsAvalible.push(item)
+            }
+        }));
+
+        return roomsAvalible
     }
 
     return (
@@ -59,7 +111,7 @@ export default function Hotels() {
                 <div className='w-full h-full flex flex-col items-center p-4 gap-8'>
                     {loading ? 'loading' : (
                         data.length > 0 ? data.map((room) => (
-                            <HotelRoom slectedRoomNumber={slectedRoomNumber} setSlectedRoomNumber={setSlectedRoomNumber} room={room} key={room.id} />
+                            <HotelRoom setAllRooms={setAllRooms} slectedRoomNumber={slectedRoomNumber} setSlectedRoomNumber={setSlectedRoomNumber} room={room} key={room.id} hndleAddNewRoomChecker={hndleAddNewRoomChecker} />
                         )) : (
                             <div>no rooms available at the moment</div>
                         ))}
@@ -75,12 +127,14 @@ export const HotelRoom = (props) => {
 
     const [roomPic, setRoomPic] = useState([])
     const [available, setAvailable] = useState(true)
+    const [selectedType, setSelectedType] = useState(0)
     const [facilitiesData, setFacilitiesData] = useState({})
+    const [checkingRoomLoading, setCheckingRoomLoading] = useState(false)
     const { actions, booking, user, isAdmin } = useContext(Context)
     const navigate = useNavigate()
 
     useEffect(() => {
-        checkAvailability()
+        // checkAvailability()
 
         getCollectionDocument(`roomType`, roomType)
         .then((res) => {
@@ -102,7 +156,7 @@ export const HotelRoom = (props) => {
     const checkAvailability = async () => {
 
         try {
-            if (booking.adult > facilitiesData.capacity) return setAvailable(false)
+            // if (booking.adult > facilitiesData.capacity) return setAvailable(false)
 
             const res = await getCollectionData('booking')
 
@@ -149,9 +203,53 @@ export const HotelRoom = (props) => {
         }
     }
 
+
+
+    const handleMinus = () => {
+        if (selectedType > 0) {
+            const sliceRoom = [...props.slectedRoomNumber]
+            const slicType = sliceRoom.filter((room) => room.record.roomType === roomType)
+            const deltedArr = slicType.pop()
+            const otherTypes = sliceRoom.filter((room) => room.record.roomType !== roomType)
+            
+            props.setAllRooms(prevData => prevData.map(item => 
+                item.id === deltedArr.id 
+                ? {...item, checked : false}
+                : item ))
+                props.setSlectedRoomNumber(otherTypes.concat(slicType))
+                setSelectedType(prev => prev - 1)
+        }
+    }
+
+    const handlePlus = async () => {
+        if (props.slectedRoomNumber.length >= booking.rooms) return
+        setCheckingRoomLoading(true)
+        try {
+            const avalibeRooms = await props.hndleAddNewRoomChecker(roomType)
+            console.log(avalibeRooms);
+            if (avalibeRooms.length > 0) {
+                props.setAllRooms(prevData => prevData.map(item => 
+                    item.id === avalibeRooms[0].id 
+                    ? {...item, checked : true}
+                    : item ))
+                    props.setSlectedRoomNumber(prev => [...prev, avalibeRooms[0]])
+                    setSelectedType(prev => prev + 1)
+            } else {
+                alert(`no room avalible for ${roomType}`)
+            }
+        } catch (err) {
+            console.log(err);
+            alert(`error: something went wrong`)
+        } finally {
+            setCheckingRoomLoading(false)
+        }
+    }
+
+    if (booking.adult > facilitiesData.capacity) return 
+
     return (
         <div className='w-full flex gap-3'>
-            {booking.rooms > 1 && <input onClick={handleAddRoomToList} type="checkbox" className='w-[20px]' />}
+            {/* {booking.rooms > 1 && <input onClick={handleAddRoomToList} type="checkbox" className='w-[20px]' />} */}
             <div className='w-full h-[350px] p-4 border-[0.8px] border-gray-300 my-2 rounded-sm flex justify-between items-center'> 
                 <div className='min-w-[250px] max-w-[270px] h-full mx-2 flex justify-center overflow-hidden'>
                     {/* <img src={roomPic} alt="picture here" className='w-full h-full  max-h-[180px]' /> */}
@@ -178,7 +276,12 @@ export const HotelRoom = (props) => {
                         <h4 className='mt-auto'> ${price}/night  </h4>
                     </div>
 
-                    <div className='flex justify-end items-center w-full gap-3'>
+                    <div className={`flex ${booking.rooms > 1 ? 'justify-between' : 'justify-end'} items-center w-full gap-3`}>
+                    {booking.rooms > 1 && <div className='flex items-center py-1 px-2 border rounded border-black'>
+                            <BiMinus onClick={handleMinus} className='cursor-pointer text-gray-600 hover:text-black' size={18} />
+                            <span className='px-4 font-medium'> {selectedType} </span>
+                            <BiPlus disabled={checkingRoomLoading} onClick={handlePlus} className={`cursor-pointer  hover:text-black ${checkingRoomLoading ? 'text-gray-300' : 'text-gray-600'}`}size={18} />
+                        </div>}
                         <button onClick={handleOnClick} disabled={!available || booking.rooms > 1} className={`p-2 rounded text-gray-0 ${available ? 'bg-primaryBlue' : 'bg-gray-300'}`}> check out </button>
                     </div>
                 </div>

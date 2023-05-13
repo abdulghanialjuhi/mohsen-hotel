@@ -124,7 +124,7 @@ export default function CheckOut() {
         guestDB.name = `${salutation} ${guestDB.name}`
         await addDoc(collection(db, "guest"), guestDB);
 
-        navigate(`/payment-information?total=${totalPrice}`)
+        navigate(`/payment-information?total=${totalPrice}&booking=${docRef.id}`)
     } catch (err) {
         console.log('err: ', err);
     } finally {

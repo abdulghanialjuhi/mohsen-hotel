@@ -9,7 +9,7 @@ export default function Location() {
     const center = useMemo(() => ({ lat: 14.5314473, lng: 49.1302514 }), []);
     // 14.5314473,49.1302514,7.06z
     return (
-        <div className='flex-grow flex mt-10 justify-center items-center mx-[-2rem] gap-3'>
+        <div className='flex-grow flex mt-10 justify-center items-center gap-3'>
      
             <div className='w-[600px] h-[500px] border'>
                 {!isLoaded ? (
@@ -24,7 +24,7 @@ export default function Location() {
                 </GoogleMap>
                 )}
             </div>
-            <div className='w-[500px] h-[400px] flex justify-center items-center flex-col gap-5 shadow-lg'>
+            <div className='w-[500px] h-[400px] flex justify-center items-center flex-col gap-5 bg-gray-0 shadow'>
                 <div className='flex'>
                     <span> Country: </span>
                     <h4> Yemen </h4>

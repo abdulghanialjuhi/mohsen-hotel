@@ -10,7 +10,7 @@ export default function MyProfile() {
     const [loading, setLoading] = useState(true)
     const params = useParams()
 
-    const profileView = ['my booking', 'update profile']
+    const profileView = ['my booking', 'update profile', 'upload-receipt']
 
     // console.log('locations:' ,params);
 

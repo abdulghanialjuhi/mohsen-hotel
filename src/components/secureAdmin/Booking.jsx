@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Table from './Table';
-import { getCollectionDatWithId, updateDataCollectionId } from '../../helper/firebaseFetch';
+import { getCollectionDatWithId, getPic, updateDataCollectionId } from '../../helper/firebaseFetch';
 import ModalForm from './ModalForm';
 
 export default function Booking() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['id', 'room Number', 'guest Name', 'checkIn Date', 'checkOut Date', 'total', 'status'])
+    const [keys] = useState(['id', 'room Number', 'guest Name', 'checkIn Date', 'checkOut Date', 'total', 'status', 'receipt'])
     const tableName = 'booking'
     const [shwoForm, setShowForm] = useState(false)
     const [record, setRecord] = useState({})
@@ -32,20 +32,28 @@ export default function Booking() {
     return (
         <div className='w-full h-full'>
             <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} defaultFunc={getIDs} handleEditRecord={handleEditRecord} editable={true} />
-            <AddDataForm shwoForm={shwoForm} setShowForm={setShowForm} keys={keys} tableName={tableName} setData={setData} primaryKey='id' record={record} />
+            <AddDataForm shwoForm={shwoForm} setShowForm={setShowForm} keys={keys} tableName={tableName} setData={setData} primaryKey='id' record={record} data={data} />
         </div>
     )
 }
 
-const AddDataForm = ({ tableName, shwoForm, setShowForm, record }) => {
+const AddDataForm = ({ tableName, shwoForm, setShowForm, record, setData, data }) => {
 
     const [selcectedSection, setSelcectedSection] = useState('pending')
     const [fonmLoading, setFonmLoading] = useState(false)
+    const [receipt, setReceipt] = useState()
 
     useEffect(() => {
         if (record) {
             setSelcectedSection(record?.record?.status)
         }
+        getPic(`/booking/${record.id}`)
+        .then((res) => {
+            setReceipt(res)
+        }).catch((err) => {
+            console.log('img error: ', err);
+            setReceipt()
+        })
     }, [record])
 
     const handleOnSubmit = async () => {
@@ -54,10 +62,10 @@ const AddDataForm = ({ tableName, shwoForm, setShowForm, record }) => {
         try {
 
             await updateDataCollectionId(tableName, record.id, {status: selcectedSection})
-            
-            // setData(prevData => {
-            //     prevData.map((data) => data.id === record.id)
-            // })
+
+            const filterData = data.find((item) => item.id === record.id)
+            filterData.record.status = selcectedSection
+            setData(prevData => prevData.map(item => item.id === record.id ? {...filterData} : item ))
 
             setShowForm(false)
         } catch (error) {
@@ -76,7 +84,10 @@ const AddDataForm = ({ tableName, shwoForm, setShowForm, record }) => {
             <ModalForm setShowModel={setShowForm}>
                 <div className='w-full mt-3 h-full flex flex-col gap-3 items-center'>
                     <h3> Update {tableName} </h3>
-                    <div className='flex mt-2 flex-wrap flex-grow justify-center gap-3'>
+                    <div className='flex mt-2 flex-wrap flex-col flex-grow justify-center gap-3'>
+                        <div className='w-[250px] h-[250px] border'>
+                            {record.record.receipt && <img src={receipt} alt="receipt" className='w-full h-full' />}
+                        </div>
                         <div className='flex flex-col'>
                             <span> Status </span>
                             <select className='p-2' onChange={handleSelctSection} value={selcectedSection} name="status">

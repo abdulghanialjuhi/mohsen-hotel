@@ -2,7 +2,6 @@ import './App.css';
 import { Routes, Route } from 'react-router-dom'
 import Home from './components/Home';
 import Promotions from './components/Promotions';
-import Events from './components/Events';
 import Gallery from './components/Gallery';
 import Location from './components/Location';
 import Contact from './components/Contact';
@@ -27,6 +26,9 @@ import MyProfile from './components/MyProfile';
 import RoomItemTable from './components/secureAdmin/RoomItem';
 import RoomDetails from './components/RoomDetails';
 import GuestTable from './components/secureAdmin/GuestTable';
+import ResetPassword from './components/ResetPassword';
+import UpdatePassword from './components/UpdatePassword';
+import UploadReceipt from './components/UploadReceipt';
 
 function App() {
   return (
@@ -43,13 +45,15 @@ function App() {
       <Route path="/check-out" element={<CheckOut />}/>
       <Route path="/payment-information" element={<PaymentInfo />} />
       <Route path="/login" element={<Login />}/>
-      {/* <Route path="/auth-update-password" element={<UpdatPassword />}/> */}
+      <Route path="/reset-password" element={<ResetPassword />}/>
 
       <Route path="/auth-my-profile/:uid" element={<MyProfile />}>
         <Route index element={ <MyBooking /> } />
         <Route path="my-booking" element={<MyBooking />}/>
         <Route path="update-profile" element={<UpdatProfile />}/>
+        <Route path="upload-receipt" element={<UploadReceipt />}/>
       </Route>
+      
       
       <Route path="/secure-admin" element={ <Admin /> }>
         <Route index element={ <Booking /> } />
@@ -64,6 +68,7 @@ function App() {
         <Route path="room-item" element={<RoomItemTable />} />
         <Route path="guest" element={<GuestTable />} />
       </Route>
+      <Route path="/secure-admin-update-password" element={ <UpdatePassword /> } />
 
     </Routes>
   );
