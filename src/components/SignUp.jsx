@@ -93,7 +93,7 @@ export default function SignUp() {
                             </div>
                             <div className='flex flex-col w-full'>
                                 <label htmlFor=""> email </label>
-                                <input value={email} onChange={(e) => setEmail(e.target.value)} className='border p-1 rounded' type="text" />
+                                <input value={email} onChange={(e) => setEmail(e.target.value)} className='border p-1 rounded' type="email" />
                             </div>
                             <div className='flex flex-col w-full'>
                                 <label htmlFor=""> phone number </label>

@@ -153,32 +153,6 @@ export const HotelRoom = (props) => {
         })
     }, [])
     
-    const checkAvailability = async () => {
-
-        try {
-            // if (booking.adult > facilitiesData.capacity) return setAvailable(false)
-
-            const res = await getCollectionData('booking')
-
-            const convertedList = convertRoomsToArr(res)
-
-            const roomBooks = convertedList.filter((book) => book.record.roomNumber.includes(roomNumber))
-            if (!roomBooks.length > 0) return setAvailable(true)
-
-            const fromDate = new Date(booking.checkIn.replaceAll('-', '/'))
-            
-            roomBooks.forEach((book) => {
-                const bookToDate = new Date(book.record.checkOutDate.replaceAll('-', '/'))
-                if(bookToDate.getTime() >= fromDate.getTime()) return setAvailable(false)
-            })
-
-        } catch (err) {
-            console.log(err);
-            return false
-        }
-
-    }
-
     const handleOnClick = () => {
         if (!user || isAdmin) {
             alert('you have to login first to checkout')
@@ -187,23 +161,6 @@ export const HotelRoom = (props) => {
         actions({type: 'SET_BOOKING', payload: {...booking, room: [props.room]}})
         navigate('/check-out')
     }
-
-    const handleAddRoomToList = (e) => {
-        if (e.target.checked) {
-            if (props.slectedRoomNumber.length < booking.rooms && available) {
-                props.setSlectedRoomNumber(prev => [...prev, props.room])
-            } else {
-                e.preventDefault()
-            }
-        } else {
-            const arr = [...props.slectedRoomNumber]
-            const deltedRoomArr = arr.filter((room) => room.record.roomNumber !== roomNumber)
-            console.log('deltedRoomArr: ', deltedRoomArr);
-            props.setSlectedRoomNumber(deltedRoomArr)
-        }
-    }
-
-
 
     const handleMinus = () => {
         if (selectedType > 0) {

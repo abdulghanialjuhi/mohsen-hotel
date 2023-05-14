@@ -40,8 +40,8 @@ export default function SearchHotelCard() {
         actions({type: 'SET_BOOKING', payload: {...booking, [person]: booking[person] - 1}})
     }
 
-    const handlePlus = (person) => {
-        if (booking[person] >= 4) return
+    const handlePlus = (person, limit) => {
+        if (booking[person] >= limit) return
         actions({type: 'SET_BOOKING', payload: {...booking, [person]: booking[person] + 1}})
     }
 
@@ -80,7 +80,7 @@ export default function SearchHotelCard() {
                         <div className='flex items-center py-2 px-3 border rounded border-black'>
                             <BiMinus onClick={handleMinus.bind(this, 'adult')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                             <span className='px-4 font-medium'> {booking.adult} </span>
-                            <BiPlus onClick={handlePlus.bind(this, 'adult')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
+                            <BiPlus onClick={handlePlus.bind(this, 'adult', 3)} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                         </div>
                     </div>
 
@@ -91,7 +91,7 @@ export default function SearchHotelCard() {
                         <div className='flex items-center py-2 px-3 border rounded border-black'>
                             <BiMinus onClick={handleMinus.bind(this, 'children')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                             <span className='px-4 font-medium'> {booking.children} </span>
-                            <BiPlus onClick={handlePlus.bind(this, 'children')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
+                            <BiPlus onClick={handlePlus.bind(this, 'children', 3)} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                         </div>
                     </div>
 
@@ -102,7 +102,7 @@ export default function SearchHotelCard() {
                         <div className='flex items-center py-2 px-3 border rounded border-black'>
                             <BiMinus onClick={handleMinus.bind(this, 'rooms')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                             <span className='px-4 font-medium'> {booking.rooms} </span>
-                            <BiPlus onClick={handlePlus.bind(this, 'rooms')} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
+                            <BiPlus onClick={handlePlus.bind(this, 'rooms', 10)} className='cursor-pointer text-gray-600 hover:text-black' size={20} />
                         </div>
                     </div>
 
