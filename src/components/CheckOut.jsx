@@ -52,11 +52,15 @@ export default function CheckOut() {
 
     const calculatePrice = () => {
         let total = 0;
-        booking.room.forEach((roomPrc) => {
-            total += roomPrc.record.price * getNights()
-        })
-        const calculatePromotion = total * ( (100-discountPercent) / 100 )
-        setTotalPrice(calculatePromotion.toFixed(2)) 
+        try {
+            booking.room.forEach((roomPrc) => {
+                total += roomPrc.record.price * getNights()
+            })
+            const calculatePromotion = total * ( (100-discountPercent) / 100 )
+            setTotalPrice(calculatePromotion.toFixed(2)) 
+        } catch (err) {
+            navigate('/')
+        }
 
     }
 
@@ -146,7 +150,7 @@ export default function CheckOut() {
             if (!isNaN(parseInt(res.percent))) {
                 const todayDate = new Date()
                 const expDate = new Date(res.expireDate.replaceAll('-', '/'))
-                if (expDate.getTime() > todayDate.getTime()) {
+                if (todayDate.getTime() > expDate.getTime()) {
                     setDiscountPercent(0)
                     setIsValidCode(true)
                 } else {

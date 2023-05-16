@@ -13,15 +13,17 @@ export default function Promotions() {
     const tableName = 'promotions'
     const primaryKey = 'promotionCode'
 
-    const handleDelete = (recordData) => {
+    const handleDelete = async (recordData) => {
         const desertRef = ref(storage, `${tableName}/${recordData.record[primaryKey]}`);
-        deleteObject(desertRef).then(() => {
+        try {
+            await deleteObject(desertRef)
+        } catch(error) {
+            console.log('error: ', error);
+        } finally {
             let cloneData = [...data]
             const deletedRecord = cloneData.filter(data => data.id !== recordData.id)
             setData(deletedRecord)
-        }).catch((error) => {
-            console.log('error: ', error);
-        });
+        }
     }
 
     return (
@@ -57,7 +59,9 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
     }
 
     const handleOnSubmit = async () => {
-        const isNullishs = Object.values(formInput).some(value => {
+        const formWithoutImage = {...formInput}
+        delete formWithoutImage['image']
+        const isNullishs = Object.values(formWithoutImage).some(value => {
             if (value === null || value === '') {
                 return true;
             }
@@ -79,7 +83,7 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             }
 
             const clone = {...formInput}
-            clone['image'] = formInput['image'].name
+            clone['image'] = formInput['image'] ? formInput['image'].name : 'no image'
             
             await setDataCollectionId(tableName, formInput[primaryKey], clone)
             
@@ -88,7 +92,7 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             dataObject['id'] = formInput[primaryKey]
             
             const storageRef = ref(storage, `/${tableName}/${formInput[primaryKey]}`)
-            await uploadBytesResumable(storageRef, formInput['image']);
+            formInput['image'] && await uploadBytesResumable(storageRef, formInput['image']);
             
             setData(prevData => [...prevData, dataObject])
 

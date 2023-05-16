@@ -22,13 +22,14 @@ import Section from './components/Section';
 import Hotels from './components/Hotels';
 import SignUp from './components/SignUp';
 import MyBooking from './components/MyBooking';
-import MyProfile from './components/MyProfile';
+import MyProfile, { ProfileInfo } from './components/MyProfile';
 import RoomItemTable from './components/secureAdmin/RoomItem';
 import RoomDetails from './components/RoomDetails';
 import GuestTable from './components/secureAdmin/GuestTable';
 import ResetPassword from './components/ResetPassword';
 import UpdatePassword from './components/UpdatePassword';
 import UploadReceipt from './components/UploadReceipt';
+import PageNotFound from './components/PageNotFound';
 
 function App() {
   return (
@@ -48,7 +49,7 @@ function App() {
       <Route path="/reset-password" element={<ResetPassword />}/>
 
       <Route path="/auth-my-profile/:uid" element={<MyProfile />}>
-        <Route index element={ <MyBooking /> } />
+        <Route index element={<ProfileInfo /> } />
         <Route path="my-booking" element={<MyBooking />}/>
         <Route path="update-profile" element={<UpdatProfile />}/>
         <Route path="upload-receipt" element={<UploadReceipt />}/>
@@ -69,7 +70,7 @@ function App() {
         <Route path="guest" element={<GuestTable />} />
       </Route>
       <Route path="/secure-admin-update-password" element={ <UpdatePassword /> } />
-
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 }

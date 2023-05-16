@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useParams, useOutletContext } from 'react-router-dom'
 import { getRealtimeDatabaseRecord } from '../helper/firebaseFetch'
 
 export default function MyProfile() {
@@ -10,9 +10,7 @@ export default function MyProfile() {
     const [loading, setLoading] = useState(true)
     const params = useParams()
 
-    const profileView = ['my booking', 'update profile', 'upload-receipt']
-
-    // console.log('locations:' ,params);
+    const profileView = ['profile', 'my booking', 'update profile', 'upload receipt']
 
     useEffect(() => {
         getRealtimeDatabaseRecord(`users/${params.uid}`)
@@ -27,7 +25,11 @@ export default function MyProfile() {
     }, [])
 
     const handleSelectTable = (table) => {
-        navigate(`/auth-my-profile/${params.uid}/${table.replace(' ', '-')}`)
+        if (table === 'profile') {
+            navigate(`/auth-my-profile/${params.uid}/`)
+        } else {
+            navigate(`/auth-my-profile/${params.uid}/${table.replace(' ', '-')}`)
+        }
     }
 
     if (loading) return 'loading'
@@ -41,7 +43,7 @@ export default function MyProfile() {
                     </div>
                     <ul>
                         {profileView.map((table) => (
-                            <li onClick={handleSelectTable.bind(this, table)} className={`p-2 text-lg cursor-pointer capitalize rounded ${!locations.pathname.split('/')[2] ? table === 'booking' && 'bg-gray-300 text-gray-0' : locations.pathname.split('/')[2]?.replace('-', ' ') === table ? 'bg-gray-300 text-gray-0' : 'hover:bg-gray-200'}`} key={table}>
+                            <li onClick={handleSelectTable.bind(this, table)} className={`p-2 text-lg cursor-pointer capitalize rounded ${!locations.pathname.split('/')[3] ? table === 'profile' && 'bg-gray-300 text-gray-0' : locations.pathname.split('/')[3]?.replace('-', ' ') === table ? 'bg-gray-300 text-gray-0' : 'hover:bg-gray-200'}`} key={table}>
                                 {table}
                             </li>
                         ))}
@@ -51,9 +53,37 @@ export default function MyProfile() {
 
             <section className='w-full mt-8'>
                 <div className='flex flex-col max-w-[1000px] mx-auto items-center w-full'>
-                    <Outlet />
+                    <Outlet context={{userInfo}} />
                 </div>
             </section>
     </div>
+    )
+}
+
+export const ProfileInfo = () => {
+    
+    const {userInfo} = useOutletContext();
+
+    return (
+        <div className='flex flex-col max-w-[600px] h-[400px] p-4 bg-gray-0 shadow mx-auto items-center w-full'>
+            <h2 className='mb-2'> Profile Information </h2>
+
+            <div className='w-full h-full flex justify-center items-center'>
+                    <div className='w-full max-w-[400px] mx-auto mt-4 flex flex-col gap-5'>
+                        <div className='flex flex-col w-full'>
+                            <label htmlFor=""> full name </label>
+                            <input disabled={true} value={userInfo.name} className='border p-1 rounded' type="text" name='name' />
+                        </div>
+                        <div className='flex flex-col w-full'>
+                            <label htmlFor=""> email </label>
+                            <input disabled value={userInfo.email} className='border p-1 rounded' type="text" name='email' />
+                        </div>
+                        <div className='flex flex-col w-full'>
+                            <label htmlFor=""> phone number </label>
+                            <input disabled={true} value={userInfo.phone} className='border p-1 rounded' type="text" name='phone' />
+                        </div>
+                    </div>
+            </div>
+        </div>
     )
 }
