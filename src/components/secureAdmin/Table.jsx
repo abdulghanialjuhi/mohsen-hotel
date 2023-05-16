@@ -112,7 +112,7 @@ const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditReco
 
     const [showModel, setShowModel] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
-    const { user } = useContext(Context)
+    const { user, isAdmin } = useContext(Context)
 
     const handleDeleteRecord = async () => {
         setDeleteLoading(true)
@@ -133,21 +133,32 @@ const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditReco
         }
     }
 
-    const isAdmin = tableName === 'admin' && user === field.id ? true : false
+    const isAdminTable = tableName === 'admin' && user === field.id ? true : false
 
     return (
         <div className='flex group justify-evenly relative bg-gray-200 w-full py-2 my-1 '>
             {keys.map((key) => (
                 !key.includes('password') && (<span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]?.toString()} </span>)
             ))}
-            {!isAdmin && <div className='absolute right-0 z-10  hidden group-hover:flex group-hover:gap-2 cursor-pointer'>
-                {editable && <div className='bg-gray-400 p-1' onClick={handleEditRecord.bind(this, field)}> 
-                    <AiOutlineEdit color='#fff' />
-                </div>}
-                {isDelete && <div className='bg-gray-400 p-1' onClick={() => setShowModel(true)}> 
-                    <BsTrash color='#fff' />
-                </div>}
-            </div>}
+            {!isAdminTable && (
+                <>
+                <div className='absolute right-0 z-10  hidden group-hover:flex group-hover:gap-2 cursor-pointer'>
+                    {editable && <div className='bg-gray-400 p-1' onClick={handleEditRecord.bind(this, field)}> 
+                        <AiOutlineEdit color='#fff' />
+                    </div>}
+                    {isDelete && <div className='bg-gray-400 p-1' onClick={() => setShowModel(true)}> 
+                        <BsTrash color='#fff' />
+                    </div>}
+
+                </div>
+                {!isAdmin && tableName === 'booking' && !field.record['receipt'] && (
+                    <div className='absolute right-0 z-10 mr-2 flex justify-center items-center'>
+                        <button onClick={handleEditRecord.bind(this, field)} className='bg-primaryBlue text-gray-0 p-1 rounded'>upload receipt</button>
+                    </div>
+                )}
+                </>
+
+            )}
             {showModel && <AlertModel handleDelete={handleDelete} tableName={tableName} setShowModel={setShowModel} onClick={handleDeleteRecord} deleteLoading={deleteLoading} />}
         </div>
     )

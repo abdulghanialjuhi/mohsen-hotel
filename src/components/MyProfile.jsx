@@ -10,7 +10,7 @@ export default function MyProfile() {
     const [loading, setLoading] = useState(true)
     const params = useParams()
 
-    const profileView = ['profile', 'my booking', 'update profile', 'upload receipt']
+    const profileView = ['profile', 'my booking', 'update profile']
 
     useEffect(() => {
         getRealtimeDatabaseRecord(`users/${params.uid}`)

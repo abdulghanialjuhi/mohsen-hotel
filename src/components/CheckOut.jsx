@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Context } from '../context/GlobalState'
 import { collection, addDoc } from "firebase/firestore"; 
 import { db } from '../firebaseConfig'
-import { useNavigate, Link } from 'react-router-dom'
-import { getRealtimeDatabaseData, getRealtimeDatabaseRecord } from '../helper/firebaseFetch';
+import { useNavigate } from 'react-router-dom'
+import { getRealtimeDatabaseRecord } from '../helper/firebaseFetch';
 import { getCollectionDocument } from '../helper/firebaseFetch';
 
 
@@ -91,10 +91,10 @@ export default function CheckOut() {
         setSubmitLoading(true)
             
         try {
-            await getRealtimeDatabaseRecord(`users/${user}`)
+            let time = new Date()
+            time = time.toJSON().split('T')[1].split(':').slice(0, 2).join(':')
 
             var result = booking.room.map(u => u.record.roomNumber).join(', ')
-            console.log(result);
             const bookdata = {
                 checkInDate: booking.checkIn,
                 checkOutDate: booking.checkOut,
@@ -102,7 +102,8 @@ export default function CheckOut() {
                 guestName: `${salutation} ${guestInfo.name}`,
                 roomNumber: result,
                 total: totalPrice,
-                status: 'pending'
+                status: 'pending',
+                time: time
             }
 
             console.log(bookdata);

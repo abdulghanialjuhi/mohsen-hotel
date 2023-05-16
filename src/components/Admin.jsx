@@ -27,7 +27,7 @@ export default function Admin() {
             </section>
 
             <section className='w-full mt-8'>
-                <div className='flex flex-col max-w-[1000px] mx-auto items-center w-full'>
+                <div className='flex flex-col max-w-[1100px] mx-auto items-center w-full'>
                     <Outlet />
                 </div>
             </section>

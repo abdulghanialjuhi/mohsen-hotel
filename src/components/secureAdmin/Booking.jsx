@@ -6,7 +6,7 @@ import ModalForm from './ModalForm';
 export default function Booking() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['id', 'room Number', 'guest Name', 'checkIn Date', 'checkOut Date', 'total', 'status', 'receipt'])
+    const [keys] = useState(['id', 'room Number', 'time', 'guest Name', 'checkIn Date', 'checkOut Date', 'total', 'status', 'receipt'])
     const tableName = 'booking'
     const [shwoForm, setShowForm] = useState(false)
     const [record, setRecord] = useState({})

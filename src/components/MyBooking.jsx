@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 export default function MyBooking() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['id', 'room Number', 'guest Name', 'checkIn Date', 'checkOut Date', 'total', 'status', 'receipt'])
+    const [keys] = useState(['id', 'time', 'checkIn Date', 'checkOut Date', 'total', 'status', 'receipt'])
     const tableName = 'booking'
     const params = useParams()
     const navigate = useNavigate()
@@ -27,9 +27,9 @@ export default function MyBooking() {
     return (
         <div className='w-full h-full flex flex-col mb-10'>
             <section className='w-full mt-8'>
-                <div className='flex flex-col max-w-[1000px] mx-auto items-center w-full'>
+                <div className='flex flex-col max-w-[1200px] mx-auto items-center w-full'>
                     <div className='w-full h-full'>
-                        <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} isDelete={false} handleEditRecord={handleEditRecord} editable={true} setData={setData} defaultFunc={hetRecordsWithId} />
+                        <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} isDelete={false} handleEditRecord={handleEditRecord} setData={setData} defaultFunc={hetRecordsWithId} />
                     </div>
                 </div>
             </section>
