@@ -6,8 +6,9 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { db } from '../../firebaseConfig'
 import { getCollectionData } from '../../helper/firebaseFetch';
 import { Context } from '../../context/GlobalState';
+import ModalForm from './ModalForm';
 
-export default function Table({ tableName, data, keys, handleDelete, setData, isDelete=true, editable=false, defaultFunc=getCollectionData, handleEditRecord=() => {} }) {
+export default function Table({ tableName, data, keys, handleDelete, setData, isDelete=true, editable=false, defaultFunc=getCollectionData, handleEditRecord=() => {}, additionalComponent }) {
 
     const [filterHistoryJobs, setFilterHistoryJobs] = useState([])
     const [loading, setLoading] = useState(true)
@@ -61,24 +62,44 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
         }
     }
     
-    const handleSearching = (value) => {
+    const handleSearching = (value, tableIdKey=tableId) => {
         let matchData = []
     
         for (let items of data) {
-            if (items.record[tableId].toLowerCase().includes(value)){
+            if (items.record[tableIdKey].toLowerCase().includes(value)){
               matchData.push(items)
             } 
         }
         setFilterHistoryJobs(matchData);
     }
 
+    const handleFilterData = (e) => {
+        const value = e.target.value
+        if (value === 'all') {
+            setFilterHistoryJobs(data)
+            return
+        }
+        handleSearching(value, 'status')
+    } 
+
     return (
         <div>
             <div className='flex justify-between items-center w-full h-12 my-4'>
                 <span className='capitalize'> {tableName} </span>
-                <div className='flex justify-between items-center h-8 w-[250px] border border-gray-500 cursor-pointer px-1 rounded'>
-                    <input onChange={handleSearch} placeholder='search' type="text" className='w-full p-1 outline-none text-sm bg-transparent' />
-                    <BsSearch className='mx-1' />
+                <div className='flex gap-3'>
+                    {tableName === 'booking' && <div className='flex gap-2 '>
+                        <select className='border rounded border-gray-500' onChange={handleFilterData}>
+                            <option value="all">All</option>
+                            <option value="checked in">checked in</option>
+                            <option value="checked out">checked out</option>
+                            <option value="pending">pending</option>
+                            <option value="paid">paid</option>
+                        </select>
+                    </div>}
+                    <div className='flex justify-between items-center h-8 w-[250px] border border-gray-500 cursor-pointer px-1 rounded'>
+                        <input onChange={handleSearch} placeholder='search' type="text" className='w-full p-1 outline-none text-sm bg-transparent' />
+                        <BsSearch className='mx-1' />
+                    </div>
                 </div>
             </div>
             <div className='w-full min-h-[300px] border'>
@@ -95,7 +116,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
                         </h3>
                     ) : filterHistoryJobs?.length > 0 ? (
                         filterHistoryJobs.map((num, i) => (
-                            <Record key={i} field={num} keys={keys} handleDelete={handleDelete} tableName={tableName} isDelete={isDelete} handleEditRecord={handleEditRecord} editable={editable} />
+                            <Record key={i} field={num} keys={keys} handleDelete={handleDelete} tableName={tableName} isDelete={isDelete} handleEditRecord={handleEditRecord} editable={editable} additionalComponent={additionalComponent} />
                         )) 
                     ) : (
                         <h3 className='text-center mt-2'>
@@ -108,10 +129,12 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
     )
 }
 
-const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditRecord, editable }) => {
+const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditRecord, editable, additionalComponent }) => {
 
     const [showModel, setShowModel] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
+    const [showModalInfo, setShowModalInfo] = useState(false)
+    const [modalData, setModalData] = useState([])
     const { user, isAdmin } = useContext(Context)
 
     const handleDeleteRecord = async () => {
@@ -135,10 +158,29 @@ const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditReco
 
     const isAdminTable = tableName === 'admin' && user === field.id ? true : false
 
+    const handleGuestClick = (bookingId) => {
+        getCollectionData('guest')
+        .then((res) => {
+            res.forEach((guestData) => {
+                if (guestData.record.bookingId === bookingId) {
+                    setModalData(guestData.record)
+                }
+            })
+        }).catch((err) => {
+            console.log(err);
+        }).finally(() => {
+            setShowModalInfo(true)
+        })
+    }
+
     return (
         <div className='flex group justify-evenly relative bg-gray-200 w-full py-2 my-1 '>
             {keys.map((key) => (
-                !key.includes('password') && (<span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]?.toString()} </span>)
+                key.includes('guest') && tableName === 'booking' ? (
+                    <button onClick={handleGuestClick.bind(this, field.record['id'])} key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden text-primaryBlue'> {field.record[key.replace(' ', '')]?.toString()} </button>
+                ) : (
+                    <span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]?.toString()} </span>
+                )
             ))}
             {!isAdminTable && (
                 <>
@@ -151,15 +193,48 @@ const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditReco
                     </div>}
 
                 </div>
-                {!isAdmin && tableName === 'booking' && !field.record['receipt'] && (
-                    <div className='absolute right-0 z-10 mr-2 flex justify-center items-center'>
-                        <button onClick={handleEditRecord.bind(this, field)} className='bg-primaryBlue text-gray-0 p-1 rounded'>upload receipt</button>
-                    </div>
+                {!isAdmin && tableName === 'booking' && !field.record['receipt'] && additionalComponent && (
+                    <>
+                        {React.cloneElement(additionalComponent, { field: field })}
+                    </>
                 )}
                 </>
 
             )}
             {showModel && <AlertModel handleDelete={handleDelete} tableName={tableName} setShowModel={setShowModel} onClick={handleDeleteRecord} deleteLoading={deleteLoading} />}
+            {showModalInfo && <DisplayModalInfo setShowForm={setShowModalInfo} modalData={modalData} />}
         </div>
+    )
+}
+
+const DisplayModalInfo = ({ setShowForm, modalData }) => {
+
+
+    return (
+        <ModalForm setShowModel={setShowForm}>
+            <div className='w-full mt-3 h-full flex flex-col gap-3 items-center'>
+                <h3> Guest information </h3>
+                <div className='w-full mt-3 h-full flex flex-col gap-3 items-center'>
+                    <div className='flex flex-col w-[50%] mt-2 flex-wrap flex-grow justify-center gap-3'>
+                        <div className='flex flex-col'>
+                            <span> name </span>
+                            <span className='border p-2'> {modalData.name ? modalData.name : 'Not found'} </span>
+                        </div>
+                        <div className='flex flex-col'>
+                            <span> email </span>
+                            <span className='border p-2'> {modalData.email ? modalData.email : 'Not found'} </span>
+                        </div>
+                        <div className='flex flex-col'>
+                            <span> phone </span>
+                            <span className='border p-2'> {modalData.phone ? modalData.phone : 'Not found'} </span>
+                        </div>
+                    </div>
+
+                    <div className='mt-auto flex w-full justify-end gap-4'>
+                        <button className='py-2 px-3 bg-red-600 text-gray-0 rounded' onClick={() => setShowForm(false)}>Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </ModalForm>
     )
 }

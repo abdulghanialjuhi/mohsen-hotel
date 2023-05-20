@@ -32,12 +32,12 @@ export default function Booking() {
     return (
         <div className='w-full h-full'>
             <Table tableName={tableName} data={data} keys={keys} handleDelete={handleDelete} setData={setData} defaultFunc={getIDs} handleEditRecord={handleEditRecord} editable={true} />
-            <AddDataForm shwoForm={shwoForm} setShowForm={setShowForm} keys={keys} tableName={tableName} setData={setData} primaryKey='id' record={record} data={data} />
+           {shwoForm && <AddDataForm setShowForm={setShowForm} keys={keys} tableName={tableName} setData={setData}  record={record} />}
         </div>
     )
 }
 
-const AddDataForm = ({ tableName, shwoForm, setShowForm, record, setData, data }) => {
+const AddDataForm = ({ tableName, setShowForm, record, setData }) => {
 
     const [selcectedSection, setSelcectedSection] = useState('pending')
     const [fonmLoading, setFonmLoading] = useState(false)
@@ -54,7 +54,7 @@ const AddDataForm = ({ tableName, shwoForm, setShowForm, record, setData, data }
             console.log('img error: ', err);
             setReceipt()
         })
-    }, [record])
+    }, [])
 
     const handleOnSubmit = async () => {
         setFonmLoading(true)
@@ -63,9 +63,10 @@ const AddDataForm = ({ tableName, shwoForm, setShowForm, record, setData, data }
 
             await updateDataCollectionId(tableName, record.id, {status: selcectedSection})
 
-            const filterData = data.find((item) => item.id === record.id)
-            filterData.record.status = selcectedSection
-            setData(prevData => prevData.map(item => item.id === record.id ? {...filterData} : item ))
+            // const filterData = data.find((item) => item.id === record.id)
+            const recordClone = {...record}
+            recordClone.record.status = selcectedSection
+            setData(prevData => prevData.map(item => item.id === record.id ? {...recordClone} : item ))
 
             setShowForm(false)
         } catch (error) {
@@ -80,7 +81,6 @@ const AddDataForm = ({ tableName, shwoForm, setShowForm, record, setData, data }
 
     return (
         <div className='mt-5 py-2 w-full min-h-12 flex flex-col justify-start'>
-        {shwoForm && (
             <ModalForm setShowModel={setShowForm}>
                 <div className='w-full mt-3 h-full flex flex-col gap-3 items-center'>
                     <h3> Update {tableName} </h3>
@@ -93,6 +93,8 @@ const AddDataForm = ({ tableName, shwoForm, setShowForm, record, setData, data }
                             <select className='p-2' onChange={handleSelctSection} value={selcectedSection} name="status">
                                 <option className='border p-2' value='pending'>pending</option>
                                 <option className='border p-2' value='paid'>paid</option>
+                                <option className='border p-2' value='checked in'>checked in</option>
+                                <option className='border p-2' value='checked out'>checked out</option>
                             </select>
                         </div>
                     </div>
@@ -103,7 +105,6 @@ const AddDataForm = ({ tableName, shwoForm, setShowForm, record, setData, data }
                     </div>
                 </div>
             </ModalForm>
-        )}
         </div>
     )
 }

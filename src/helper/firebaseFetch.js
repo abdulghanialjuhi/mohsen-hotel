@@ -105,9 +105,9 @@ export const getCollectionDocument = async (table, record) => {
     }
 }
 
-export const getNestedCollectionData = async (table, sub) => {
+export const getNestedCollectionData = async (table, condition, sub) => {
 
-    const q = query(collection(db, table), where("section", "==", sub));
+    const q = query(collection(db, table), where(condition, "==", sub));
     const dataArr = []
     
     const querySnapshot = await getDocs(q);

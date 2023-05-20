@@ -10,7 +10,7 @@ export default function Section() {
     const params = useParams()
 
     useEffect(() => {
-        getNestedCollectionData('gallery', params.section)
+        getNestedCollectionData('gallery', "section", params.section)
         .then((res) => {
             setSectionData(res)
         }).catch((err) => {

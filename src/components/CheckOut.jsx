@@ -18,7 +18,7 @@ export default function CheckOut() {
     const [discountPercent, setDiscountPercent] = useState(0)
     const [promotionInput, setPromotionInput] = useState('')
     const [promotionLoading, setPromotionLoading] = useState(false)
-    const [isValidCode, setIsValidCode] = useState(false)
+    const [isValidCode, setIsValidCode] = useState('')
 
     const [isGuest, setIsGuest] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0)
@@ -153,19 +153,19 @@ export default function CheckOut() {
                 const expDate = new Date(res.expireDate.replaceAll('-', '/'))
                 if (todayDate.getTime() > expDate.getTime()) {
                     setDiscountPercent(0)
-                    setIsValidCode(true)
+                    setIsValidCode('expired code!')
                 } else {
                     setDiscountPercent(parseInt(res.percent))
-                    setIsValidCode(false)
+                    setIsValidCode('')
                 }
             } else {
                 setDiscountPercent(0)
-                setIsValidCode(true)
+                setIsValidCode('invalid code!')
             }
         }).catch((err) => {
             console.log(err);
             setDiscountPercent(0)
-            setIsValidCode(true)
+            setIsValidCode('invalid code!')
         }).finally(() => {
             setPromotionLoading(false)
         })
@@ -205,7 +205,7 @@ export default function CheckOut() {
                             <input value={promotionInput} onChange={(e) => setPromotionInput(e.target.value)} className='w-full p-1 rounded outline-none border' type="text" name="promotion" placeholder='Discount Code' />
                             <button disabled={promotionLoading} onClick={handleCheckPromotions} className='px-3 bg-primaryBlue rounded ml-[-10px] text-gray-0 hover:bg-[#1162be]'>{promotionLoading ? 'checking...' : 'Apply'}</button>
                         </div>
-                        {isValidCode && <span className='text-[11px] text-red-500'> invalid code! </span>}
+                        {isValidCode && <span className='text-[11px] text-red-500'> {isValidCode} </span>}
                     </div>
 
                     <div className='mt-auto border-t w-full flex flex-col justify-center items-center'>

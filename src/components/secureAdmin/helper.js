@@ -1,12 +1,16 @@
 import { getCollectionData } from "../../helper/firebaseFetch"
 
 
-export const setFormKeys = (keys) => {
+export const setFormKeys = (keys, values={}) => {
     return new Promise((resolve, reject) => {
         const obj = {}
         keys.forEach((key, i, arr) => {
             if (key !== 'section' && key !== 'bed Type') {
-                obj[key.replace(' ', '')] = ''
+                if (Object.keys(values).length > 0) {
+                    obj[key.replace(' ', '')] = values[key.replace(' ', '')]
+                } else {
+                    obj[key.replace(' ', '')] = ''
+                }
             }
             if (i === arr.length -1) resolve(obj)
         })

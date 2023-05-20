@@ -66,12 +66,18 @@ export default function Hotels() {
             if (!roomBooks.length > 0) return true
 
             const fromDate = new Date(booking.checkIn.replaceAll('-', '/'))
-            
+            const toDate = new Date(booking.checkOut.replaceAll('-', '/'))
+
+            let isAvalibe = true
             roomBooks.forEach((book) => {
-                const bookToDate = new Date(book.record.checkOutDate.replaceAll('-', '/'))
-                if(bookToDate.getTime() >= fromDate.getTime()) return false
+                const bookFromDate = new Date(book.record.checkInDate.replaceAll('-', '/'))
+        
+                if(bookFromDate.getTime() <= toDate.getTime() && bookFromDate.getTime() >= fromDate.getTime()) {
+                    isAvalibe = false
+                }
             })
 
+            return isAvalibe
         } catch (err) {
             console.log(err);
             return false
@@ -104,7 +110,7 @@ export default function Hotels() {
                     {booking.rooms > 1 && (
                         <>
                             <span className='text-gray-400'> select {booking.rooms} rooms </span>
-                            <button onClick={handleOnClick} disabled={slectedRoomNumber.length < booking.rooms} className={`p-2 rounded text-gray-0 ${slectedRoomNumber.length < booking.rooms ? 'bg-gray-300' : 'bg-primaryBlue'}`}> check out </button>
+                            <button onClick={handleOnClick} disabled={slectedRoomNumber.length < booking.rooms} className={`p-2 rounded text-gray-0 ${slectedRoomNumber.length < booking.rooms ? 'bg-gray-300' : 'bg-primaryBlue'}`}> book </button>
                         </>
                     )}
                 </div>
@@ -183,7 +189,7 @@ export const HotelRoom = (props) => {
         setCheckingRoomLoading(true)
         try {
             const avalibeRooms = await props.hndleAddNewRoomChecker(roomType)
-            console.log(avalibeRooms);
+
             if (avalibeRooms.length > 0) {
                 props.setAllRooms(prevData => prevData.map(item => 
                     item.id === avalibeRooms[0].id 
@@ -239,7 +245,7 @@ export const HotelRoom = (props) => {
                             <span className='px-4 font-medium'> {selectedType} </span>
                             <BiPlus disabled={checkingRoomLoading} onClick={handlePlus} className={`cursor-pointer  hover:text-black ${checkingRoomLoading ? 'text-gray-300' : 'text-gray-600'}`}size={18} />
                         </div>}
-                        <button onClick={handleOnClick} disabled={!available || booking.rooms > 1} className={`p-2 rounded text-gray-0 ${available ? 'bg-primaryBlue' : 'bg-gray-300'}`}> check out </button>
+                        <button onClick={handleOnClick} disabled={!available || booking.rooms > 1} className={`p-2 rounded text-gray-0 ${available ? 'bg-primaryBlue' : 'bg-gray-300'}`}> Book </button>
                     </div>
                 </div>
             </div>
@@ -296,7 +302,7 @@ function Panner({ data }) {
     )
 }
 
-const convertRoomsToArr = (list) => {
+export const convertRoomsToArr = (list) => {
     list.map((book) => {
         book.record.roomNumber = book.record.roomNumber.split(', ')
     })
