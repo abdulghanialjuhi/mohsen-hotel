@@ -176,12 +176,13 @@ const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditReco
     return (
         <div className='flex group justify-evenly relative bg-gray-200 w-full py-2 my-1 '>
             {keys.map((key) => (
-                key.includes('guest') && tableName === 'booking' ? (
-                    <button onClick={handleGuestClick.bind(this, field.record['id'])} key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden text-primaryBlue'> {field.record[key.replace(' ', '')]?.toString()} </button>
-                ) : (
-                    <span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]?.toString()} </span>
-                )
-            ))}
+                !key.includes('password') && (
+                    key.includes('guest') && tableName === 'booking' ? (
+                        <button onClick={handleGuestClick.bind(this, field.record['id'])} key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden text-primaryBlue'> {field.record[key.replace(' ', '')]?.toString()} </button>
+                    ) : (
+                        <span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]?.toString()} </span>
+                    )
+                )))}
             {!isAdminTable && (
                 <>
                 <div className='absolute right-0 z-10  hidden group-hover:flex group-hover:gap-2 cursor-pointer'>

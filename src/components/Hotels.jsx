@@ -28,9 +28,6 @@ export default function Hotels() {
     const navigate = useNavigate()
     const booking = { checkIn,checkOut, adult, children, rooms }
 
-
-    // useEffect(() => console.log(allRooms), [allRooms])
-
     useEffect(() => {
         actions({type: 'SET_BOOKING', payload: booking})
         getCollectionData('rooms').then((res) => {
@@ -65,14 +62,15 @@ export default function Hotels() {
             const roomBooks = convertedList.filter((book) => book.record.roomNumber.includes(room.record.roomNumber))
             if (!roomBooks.length > 0) return true
 
-            const fromDate = new Date(booking.checkIn.replaceAll('-', '/'))
-            const toDate = new Date(booking.checkOut.replaceAll('-', '/'))
+            const fromDate = new Date(booking.checkIn.replaceAll('-', '/')).setHours(0,0,0,0)
+            const toDate = new Date(booking.checkOut.replaceAll('-', '/')).setHours(0,0,0,0)
 
             let isAvalibe = true
             roomBooks.forEach((book) => {
                 const bookFromDate = new Date(book.record.checkInDate.replaceAll('-', '/'))
+                const bookToDate = new Date(book.record.checkOutDate.replaceAll('-', '/'))
         
-                if(bookFromDate.getTime() <= toDate.getTime() && bookFromDate.getTime() >= fromDate.getTime()) {
+                if((bookFromDate.getTime() <= toDate && bookFromDate.getTime() >= fromDate) || (bookToDate.getTime() <= toDate && bookToDate.getTime() >= fromDate) ) {
                     isAvalibe = false
                 }
             })
@@ -84,9 +82,6 @@ export default function Hotels() {
         }
 
     }
-
-    // useEffect(() => console.log('slectedRoomNumber: ', slectedRoomNumber), [slectedRoomNumber])
-
 
     const hndleAddNewRoomChecker = async (type) => {
 
@@ -129,13 +124,13 @@ export default function Hotels() {
 
 export const HotelRoom = (props) => {
 
-    const { name, roomNumber, price, roomType } = props.room.record
+    const { name, price, roomType } = props.room.record
 
     const [roomPic, setRoomPic] = useState([])
-    const [available, setAvailable] = useState(true)
     const [selectedType, setSelectedType] = useState(0)
     const [facilitiesData, setFacilitiesData] = useState({})
     const [checkingRoomLoading, setCheckingRoomLoading] = useState(false)
+    const [loadBookRoom, setLoadBookRoom] = useState(false)
     const { actions, booking, user, isAdmin } = useContext(Context)
     const navigate = useNavigate()
 
@@ -159,13 +154,26 @@ export const HotelRoom = (props) => {
         })
     }, [])
     
-    const handleOnClick = () => {
+    const handleOnClick = async () => {
         if (!user || isAdmin) {
             alert('you have to login first to checkout')
             return false
         }
-        actions({type: 'SET_BOOKING', payload: {...booking, room: [props.room]}})
-        navigate('/check-out')
+        setLoadBookRoom(true)
+        try {
+            const avalibeRooms = await props.hndleAddNewRoomChecker(roomType)
+            if (avalibeRooms.length > 0) {
+                actions({type: 'SET_BOOKING', payload: {...booking, room: [avalibeRooms[0]]}})
+                navigate('/check-out')
+            } else {
+                alert(`no room avalible for ${roomType}`)
+            }
+        } catch (err) {
+            console.log(err);
+            alert('Sorry, Something went wrong')
+        } finally {
+            setLoadBookRoom(false)
+        }
     }
 
     const handleMinus = () => {
@@ -212,10 +220,8 @@ export const HotelRoom = (props) => {
 
     return (
         <div className='w-full flex gap-3'>
-            {/* {booking.rooms > 1 && <input onClick={handleAddRoomToList} type="checkbox" className='w-[20px]' />} */}
             <div className='w-full h-[350px] p-4 border-[0.8px] border-gray-300 my-2 rounded-sm flex justify-between items-center'> 
                 <div className='min-w-[250px] max-w-[270px] h-full mx-2 flex justify-center overflow-hidden'>
-                    {/* <img src={roomPic} alt="picture here" className='w-full h-full  max-h-[180px]' /> */}
                     {roomPic.length > 0 && <Panner data={roomPic} />}
                 </div>
                 <div className='flex flex-col flex-grow h-full justify-center items-center'>
@@ -240,12 +246,15 @@ export const HotelRoom = (props) => {
                     </div>
 
                     <div className={`flex ${booking.rooms > 1 ? 'justify-between' : 'justify-end'} items-center w-full gap-3`}>
-                    {booking.rooms > 1 && <div className='flex items-center py-1 px-2 border rounded border-black'>
-                            <BiMinus onClick={handleMinus} className='cursor-pointer text-gray-600 hover:text-black' size={18} />
-                            <span className='px-4 font-medium'> {selectedType} </span>
-                            <BiPlus disabled={checkingRoomLoading} onClick={handlePlus} className={`cursor-pointer  hover:text-black ${checkingRoomLoading ? 'text-gray-300' : 'text-gray-600'}`}size={18} />
-                        </div>}
-                        <button onClick={handleOnClick} disabled={!available || booking.rooms > 1} className={`p-2 rounded text-gray-0 ${available ? 'bg-primaryBlue' : 'bg-gray-300'}`}> Book </button>
+                        {booking.rooms > 1 ? (
+                            <div className='flex items-center py-1 px-2 border rounded border-black'>
+                                <BiMinus onClick={handleMinus} className='cursor-pointer text-gray-600 hover:text-black' size={18} />
+                                <span className='px-4 font-medium'> {selectedType} </span>
+                                <BiPlus disabled={checkingRoomLoading} onClick={handlePlus} className={`cursor-pointer  hover:text-black ${checkingRoomLoading ? 'text-gray-300' : 'text-gray-600'}`}size={18} />
+                            </div>
+                        ) : (
+                            <button onClick={handleOnClick} disabled={loadBookRoom || booking.rooms > 1} className={`p-2 rounded text-gray-0 bg-primaryBlue`}> Book </button>
+                        )}
                     </div>
                 </div>
             </div>

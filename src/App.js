@@ -23,7 +23,6 @@ import Hotels from './components/Hotels';
 import SignUp from './components/SignUp';
 import MyBooking from './components/MyBooking';
 import MyProfile, { ProfileInfo } from './components/MyProfile';
-import RoomItemTable from './components/secureAdmin/RoomItem';
 import RoomDetails from './components/RoomDetails';
 import GuestTable from './components/secureAdmin/GuestTable';
 import ResetPassword from './components/ResetPassword';
@@ -66,7 +65,6 @@ function App() {
         <Route path="promotions" element={<PromotionsTable />} />
         <Route path="gallery" element={<GalleryTable />} />
         <Route path="gallery-sections" element={<GallerySections />} />
-        <Route path="room-item" element={<RoomItemTable />} />
         <Route path="guest" element={<GuestTable />} />
       </Route>
       <Route path="/secure-admin-update-password" element={ <UpdatePassword /> } />

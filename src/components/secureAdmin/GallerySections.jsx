@@ -4,6 +4,7 @@ import Table from './Table';
 import { ref, uploadBytesResumable, deleteObject } from "firebase/storage";
 import { checkPrimaryKey, getInputType, setFormKeys } from './helper';
 import { setDataCollectionId } from '../../helper/firebaseFetch';
+import ModalForm from './ModalForm';
 
 export default function Gallery() {
 
@@ -94,7 +95,7 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
             const obj = {...formInput}
             Object.keys(obj).forEach(k => obj[k.replace(' ', '')] = '');
             setFormInput(obj)
-
+            setShowForm(false)
         } catch (error) {
             console.log('error: ', error);
         } finally {
@@ -108,23 +109,33 @@ const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
                 <button onClick={() => setShowForm(!shwoForm)} className='bg-gray-700 hover:bg-gray-800 p-3 rounded text-gray-0'> Add new {tableName} </button>
             </div>
             {shwoForm && (
-                <div className='w-full mt-3 min-h-[5rem] flex flex-wrap gap-3 items-center'>
-                    {keys.map((key) => (
-                        key !== 'section' &&
-                        <div key={key} className='flex flex-col'>
-                            <span> {key} </span>
-                            {key.includes('image') ? ( 
-                                    <input onChange={(e) => handleFormChange(e, key.replace(' ', ''))} accept="image/png, image/jpeg" type={getInputType(key)} name={key} className='border p-2' />
-                                ) : (
-                                    <input value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
-                                )
-                            }
+                <ModalForm setShowModel={setShowForm}>
+                    <div className='w-full mt-3 h-full flex flex-col gap-3 items-center'>
+                        <h3> Add New {tableName} </h3>
+                        <div className='flex mt-2 flex-wrap flex-grow justify-center gap-3'>
+                            <div className='w-[90%] mx-auto mt-3 min-h-[5rem] flex flex-wrap gap-3 items-center'>
+                                {keys.map((key) => (
+                                    key !== 'section' &&
+                                    <div key={key} className='flex flex-col'>
+                                        <span> {key} </span>
+                                        {key.includes('image') ? ( 
+                                                <input onChange={(e) => handleFormChange(e, key.replace(' ', ''))} accept="image/png, image/jpeg" type={getInputType(key)} name={key} className='border p-2' />
+                                            ) : (
+                                                <input value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
+                                            )
+                                        }
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className='mt-auto flex w-full justify-end gap-4'>
+                                <button disabled={fonmLoading} className='py-2 px-3 bg-red-600 text-gray-0 rounded' onClick={() => setShowForm(false)}>Cancel</button>
+                                <button disabled={fonmLoading} className='py-2 px-3 bg-primaryBlue text-gray-0 rounded' onClick={handleOnSubmit}>{fonmLoading ? 'adding...' : 'submit'}</button>
+                            </div>
                         </div>
-                    ))}
-                    <div className='ml-auto h-full flex items-end'>
-                        <button disabled={fonmLoading} className='py-2 px-3 bg-primaryBlue text-gray-0 rounded' onClick={handleOnSubmit}>{fonmLoading ? 'adding...' : 'submit'}</button>
                     </div>
-                </div>
+                </ModalForm>
+
             )}
         </div>
     )

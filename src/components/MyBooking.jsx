@@ -208,14 +208,15 @@ const checkAvailability = async (item, checkIn, checkOut, id) => {
         const roomBooks = convertedList.filter((book) => book.record.roomNumber.includes(item.record.roomNumber) && book.id !== id)
         if (!roomBooks.length > 0) return true
 
-        const fromDate = new Date(checkIn.replaceAll('-', '/'))
-        const toDate = new Date(checkOut.replaceAll('-', '/'))
+        const fromDate = new Date(checkIn.replaceAll('-', '/')).setHours(0,0,0,0)
+        const toDate = new Date(checkOut.replaceAll('-', '/')).setHours(0,0,0,0)
 
         let isAvalibe = true
         roomBooks.forEach((book) => {
             const bookFromDate = new Date(book.record.checkInDate.replaceAll('-', '/'))
-
-            if(bookFromDate.getTime() <= toDate.getTime() && bookFromDate.getTime() >= fromDate.getTime()) {
+            const bookToDate = new Date(book.record.checkOutDate.replaceAll('-', '/'))
+        
+            if((bookFromDate.getTime() <= toDate && bookFromDate.getTime() >= fromDate) || (bookToDate.getTime() <= toDate && bookToDate.getTime() >= fromDate) ) {
                 isAvalibe = false
             }
         })

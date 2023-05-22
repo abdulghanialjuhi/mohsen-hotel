@@ -3,6 +3,7 @@ import Table from './Table';
 import axios from 'axios'
 import { Context } from '../../context/GlobalState';
 import { getRealtimeDatabaseData, setRealtimeDatabaseData } from '../../helper/firebaseFetch';
+import ModalForm from './ModalForm';
 
 export default function UsersTable() {
 
@@ -111,6 +112,8 @@ export const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
 
             Object.keys(obj).forEach(k => obj[k] = '');
             setFormInput(obj)
+            setShowForm(false)
+
         } catch (error) {
             console.log('error: ', error);
             if (error.response.data.message) {
@@ -129,17 +132,26 @@ export const AddDataForm = ({ tableName, keys, setData, primaryKey }) => {
                 <button onClick={() => setShowForm(!shwoForm)} className='bg-gray-700 hover:bg-gray-800 p-3 rounded text-gray-0'> Add new {tableName} </button>
             </div>
             {shwoForm && (
-                <div className='w-full mt-3 min-h-[5rem] flex flex-wrap gap-3 items-center'>
-                    {keys.map((key) => (
-                        <div key={key} className='flex flex-col'>
-                            <span> {key} </span>
-                            <input value={formInput[key]} onChange={(e) => handleFormChange(e, key)} type={getInputType(key)} name={key} className='border p-2'   />
+                <ModalForm setShowModel={setShowForm}>
+                    <div className='w-full mt-3 h-full flex flex-col gap-3 items-center'>
+                        <h3> Add New {tableName} </h3>
+                        <div className='flex mt-2 flex-col w-full flex-grow justify-center gap-3'>
+                            <div className='w-[90%] mx-auto mt-3 min-h-[5rem] flex flex-wrap gap-3 items-center'>
+                                {keys.map((key) => (
+                                    <div key={key} className='flex flex-col'>
+                                        <span> {key} </span>
+                                        <input value={formInput[key]} onChange={(e) => handleFormChange(e, key)} type={getInputType(key)} name={key} className='border p-2'   />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className='mt-auto flex w-full justify-end gap-4'>
+                                <button disabled={fonmLoading} className='py-2 px-3 bg-red-600 text-gray-0 rounded' onClick={() => setShowForm(false)}>Cancel</button>
+                                <button disabled={fonmLoading} className='py-2 px-3 bg-primaryBlue text-gray-0 rounded' onClick={handleOnSubmit}>{fonmLoading ? 'adding...' : 'submit'}</button>
+                            </div>
                         </div>
-                    ))}
-                    <div className='ml-auto h-full flex items-end'>
-                        <button disabled={fonmLoading} className='py-2 px-3 bg-primaryBlue text-gray-0 rounded' onClick={handleOnSubmit}>{fonmLoading ? 'adding...' : 'submit'}</button>
                     </div>
-                </div>
+                </ModalForm>
             )}
         </div>
     )
