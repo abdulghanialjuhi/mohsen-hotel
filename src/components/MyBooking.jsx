@@ -120,20 +120,26 @@ const EditDataForm = ({ tableName, keys, setData, setEditForm, record, disabledK
                 total += room.record.price * getNights(formInput.checkInDate, formInput.checkOutDate)
             })
 
-            if (total !== formInput['total'] && formInput['status'] === 'paid') {
-                alert('Sorry, you are not abele to update the booking, due to price difference')
-                return
-            }
+            // if (total !== parseInt(formInput['total']) && formInput['status'] === 'paid') {
+            //     alert('Sorry, you are not abele to update the booking, due to price difference')
+            //     return
+            // }
 
             var result = roomsAvalible.map(u => u.record.roomNumber).join(', ')
+            if (formInput['status'] === 'paid') {
+                total -= formInput['total']
+            }
+
             formInput['total'] = total
             formInput['roomNumber'] = result
-
+            formInput['status'] = 'pending'
+            
             const updatedObj = {}
             updatedObj['total'] = total
             updatedObj['roomNumber'] = result
             updatedObj['checkInDate'] = formInput.checkInDate
             updatedObj['checkOutDate'] = formInput.checkOutDate
+            updatedObj['status'] = 'pending'
 
             await updateDataCollectionId(tableName, record.id, updatedObj)
 
@@ -153,6 +159,8 @@ const EditDataForm = ({ tableName, keys, setData, setEditForm, record, disabledK
     if (!Object.keys(formInput).length > 0) return
 
     const todayDate = new Date().toISOString().split("T")[0]
+    const isEditable = todayDate > formInput['checkInDate'] ? false : true
+    console.log(formInput['checkInDate'], todayDate, isEditable);
 
     return (
         <div className='mt-5 py-2 w-full min-h-12 flex flex-col justify-start'>
@@ -165,7 +173,7 @@ const EditDataForm = ({ tableName, keys, setData, setEditForm, record, disabledK
                             {keys.map((key) => (
                                 <div key={key} className='flex flex-col'>
                                     <span> {key} </span>
-                                    <input min={todayDate} disabled={disabledKeys.includes(key.replace(' ', ''))} value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
+                                    <input  min={todayDate} disabled={disabledKeys.includes(key.replace(' ', '')) || !isEditable} value={formInput[key.replace(' ', '')]} onChange={(e) => handleFormChange(e, key.replace(' ', ''))} type={getInputType(key)} name={key} className='border p-2' />
                                 </div>
                             ))}
                         </div>

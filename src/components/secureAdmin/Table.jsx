@@ -12,6 +12,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
 
     const [filterHistoryJobs, setFilterHistoryJobs] = useState([])
     const [loading, setLoading] = useState(true)
+    const [tableId, setTableId] = useState('id')
 
     let typingTimer;                
     let doneTypingInterval = 1000; 
@@ -33,7 +34,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
             return 'name'
         }
     } 
-    const tableId = getTableId(tableName)
+
 
     useEffect(() => {
         defaultFunc(tableName).then((res) => {
@@ -45,6 +46,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
             setLoading(false)
         })
 
+        setTableId(getTableId(tableName))
     }, [])
 
 
@@ -97,12 +99,12 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
                         </select>
                     </div>}
                     <div className='flex justify-between items-center h-8 w-[250px] border border-gray-500 cursor-pointer px-1 rounded'>
-                        <input onChange={handleSearch} placeholder='search' type="text" className='w-full p-1 outline-none text-sm bg-transparent' />
+                        <input onChange={handleSearch} placeholder={`search by ${tableId}`} type="text" className='w-full p-1 outline-none text-sm bg-transparent' />
                         <BsSearch className='mx-1' />
                     </div>
                 </div>
             </div>
-            <div className='w-full min-h-[300px] border'>
+            <div className='w-full min-h-[300px] shadow bg-gray-0'>
                 <div className='flex items-center justify-evenly w-full h-10 bg-gray-700'>
                     {keys.map((head) => (
                         !head.includes('password') &&

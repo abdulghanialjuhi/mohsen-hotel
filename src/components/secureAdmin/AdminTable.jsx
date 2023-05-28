@@ -7,7 +7,7 @@ import ModalForm from './ModalForm';
 export default function AdminTable() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['name', 'email'])
+    const [keys] = useState(['name', 'email', 'password'])
     const tableName = 'admin'
     const { user } = useContext(Context)
 

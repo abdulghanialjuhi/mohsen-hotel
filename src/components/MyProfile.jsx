@@ -43,7 +43,7 @@ export default function MyProfile() {
                     </div>
                     <ul>
                         {profileView.map((table) => (
-                            <li onClick={handleSelectTable.bind(this, table)} className={`p-2 text-lg cursor-pointer capitalize rounded ${!locations.pathname.split('/')[3] ? table === 'profile' && 'bg-gray-300 text-gray-0' : locations.pathname.split('/')[3]?.replace('-', ' ') === table ? 'bg-gray-300 text-gray-0' : 'hover:bg-gray-200'}`} key={table}>
+                            <li onClick={handleSelectTable.bind(this, table)} className={`p-2 text-lg cursor-pointer capitalize rounded ${!locations.pathname.split('/')[3] ? table === 'profile' && 'bg-primaryBlue text-gray-0' : locations.pathname.split('/')[3]?.replace('-', ' ') === table ? 'bg-primaryBlue text-gray-0' : 'hover:bg-gray-200'}`} key={table}>
                                 {table}
                             </li>
                         ))}

@@ -98,14 +98,16 @@ export default function Hotels() {
     }
 
     return (
-        <div className='h-full w-screen flex justify-center items-center p-4 my-8 mt-10 max-w-[1000px] mx-auto shadow rounded bg-gray-0'>
+        <div className='h-full w-screen flex justify-center items-center p-4 my-8 mt-10 max-w-[1000px] mx-auto border rounded'>
             <div className='max-w-[760px] w-full h-[70%] rounded-lg overflow-scroll'>
-                <div className='w-full flex flex-col justify-center items-center'>
+                <div className='w-full flex flex-col justify-center items-center px-4'>
                     <h3 className='text-xl'> Available Rooms </h3>
                     {booking.rooms > 1 && (
                         <>
                             <span className='text-gray-400'> select {booking.rooms} rooms </span>
-                            <button onClick={handleOnClick} disabled={slectedRoomNumber.length < booking.rooms} className={`p-2 rounded text-gray-0 ${slectedRoomNumber.length < booking.rooms ? 'bg-gray-300' : 'bg-primaryBlue'}`}> book </button>
+                            <div className='mt-2 flex justify-end w-full'>
+                                <button onClick={handleOnClick} disabled={slectedRoomNumber.length < booking.rooms} className={`p-2 px-4 rounded text-gray-0 ${slectedRoomNumber.length < booking.rooms ? 'bg-gray-300' : 'bg-primaryBlue'}`}> book </button>
+                            </div>
                         </>
                     )}
                 </div>
@@ -220,7 +222,7 @@ export const HotelRoom = (props) => {
 
     return (
         <div className='w-full flex gap-3'>
-            <div className='w-full h-[350px] p-4 border-[0.8px] border-gray-300 my-2 rounded-sm flex justify-between items-center'> 
+            <div className='w-full h-[350px] p-4 shadow bg-gray-0 my-2 rounded-sm flex justify-between items-center'> 
                 <div className='min-w-[250px] max-w-[270px] h-full mx-2 flex justify-center overflow-hidden'>
                     {roomPic.length > 0 && <Panner data={roomPic} />}
                 </div>
@@ -253,7 +255,7 @@ export const HotelRoom = (props) => {
                                 <BiPlus disabled={checkingRoomLoading} onClick={handlePlus} className={`cursor-pointer  hover:text-black ${checkingRoomLoading ? 'text-gray-300' : 'text-gray-600'}`}size={18} />
                             </div>
                         ) : (
-                            <button onClick={handleOnClick} disabled={loadBookRoom || booking.rooms > 1} className={`p-2 rounded text-gray-0 bg-primaryBlue`}> Book </button>
+                            <button onClick={handleOnClick} disabled={loadBookRoom || booking.rooms > 1} className={`p-2 px-4 rounded text-gray-0 bg-primaryBlue`}> Book </button>
                         )}
                     </div>
                 </div>

@@ -127,12 +127,12 @@ export default function Admin() {
     }
 
     return (
-        <div className='w-full h-full flex flex-col mb-10'>
+        <div className='w-full h-full flex flex-col mb-10 shadow bg-gray-0'>
             <section className='flex w-full mt-6 justify-between'>
-                <aside className='p-4 w-full max-w-[200px] rounded border'>
+                <aside className='p-4 w-full max-w-[200px] rounded shadow bg-gray-0'>
                     <ul>
                         {tables.map((table) => (
-                            <li onClick={handleSelectTable.bind(this, table.tableName)} className={`p-2 text-lg cursor-pointer capitalize rounded ${!locations.pathname.split('/')[2] ? table.tableName === 'booking' && 'bg-gray-300 text-gray-0' : locations.pathname.split('/')[2]?.replace('-', ' ') === table.tableName ? 'bg-gray-300 text-gray-0' : 'hover:bg-gray-200'}`} key={table.tableName}>
+                            <li onClick={handleSelectTable.bind(this, table.tableName)} className={`p-2 text-lg cursor-pointer capitalize rounded ${!locations.pathname.split('/')[2] ? table.tableName === 'booking' && 'bg-primaryBlue text-gray-0' : locations.pathname.split('/')[2]?.replace('-', ' ') === table.tableName ? 'bg-primaryBlue text-gray-0' : 'hover:bg-gray-200'}`} key={table.tableName}>
                                 {table.tableName}
                             </li>
                         ))}
