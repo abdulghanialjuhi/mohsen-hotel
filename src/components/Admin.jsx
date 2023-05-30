@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     }
 });
 
-const MyDocument = ({ from, to, single, double, triple }) => {
+const MyDocument = ({ from, to, single, double, triple, total }) => {
     
     
     return (
@@ -113,7 +113,7 @@ const MyDocument = ({ from, to, single, double, triple }) => {
                             <Text > Total </Text>
                         </View>
                         <View style={styles.labelValue}>
-                            <Text> {triple} </Text>
+                            <Text> {total} </Text>
                         </View>
                     </View>
                 </View>
@@ -177,6 +177,7 @@ const PrintReport = ({ setShowReport }) => {
         const singleType = []
         const doubleType = []
         const tripleType = []
+        let total = 0
 
         for (let book of booking) {
 
@@ -192,11 +193,13 @@ const PrintReport = ({ setShowReport }) => {
                 } else if (roomRes.roomType === 'type_triple') {
                     tripleType.push(book)
                 }
+
+                total += book.record.total
             }
         }
 
         console.log('booking: ', booking);
-        return [singleType, doubleType, tripleType]
+        return [singleType, doubleType, tripleType, total]
 
     }
 
@@ -223,12 +226,9 @@ const PrintReport = ({ setShowReport }) => {
             setLoading(true)
 
             const booking = await getCollectionData('booking')
-            console.log(booking);
-            const[ singleType, doubleType, tripleType ]= await getDateBooking(from, to, booking)
-            console.log('singleType: ', singleType);
-            console.log('doubleType: ', doubleType);
-            console.log('tripleType: ', tripleType);
-            setTypesQuty({'singleType': singleType.length, 'doubleType': doubleType.length, 'tripleType': tripleType.length})
+            const[ singleType, doubleType, tripleType, total ]= await getDateBooking(from, to, booking)
+            setTypesQuty({'singleType': singleType.length, 'doubleType': doubleType.length, 'tripleType': tripleType.length, 'total': total})
+
         } catch (err) {
             console.log(err);
             alert('sorry, Something went wrong')
@@ -253,7 +253,7 @@ const PrintReport = ({ setShowReport }) => {
                             <input min={fromDate+1} onChange={(e) => setToDate(e.target.value)} value={toDate} type="date" className='border p-2' />
                         </div>
                     </div>
-                    {fromDate && toDate && Object.keys(typesQuty).length > 0 && <PDFDownloadLink document={< MyDocument from={fromDate} to={toDate} single={typesQuty.singleType} double={typesQuty.doubleType} triple={typesQuty.tripleType} total={typesQuty} />} fileName="hotel-report.pdf">
+                    {fromDate && toDate && Object.keys(typesQuty).length > 0 && <PDFDownloadLink document={< MyDocument from={fromDate} to={toDate} single={typesQuty.singleType} double={typesQuty.doubleType} triple={typesQuty.tripleType} total={typesQuty.total} />} fileName="hotel-report.pdf">
                     {({ blob, url, loading, error }) => (
                         <div className='w-full flex p-1 justify-center mt-5'>
                             <button className='rounded p-2 text-gray-0 bg-primaryBlue'> 

@@ -62,12 +62,12 @@ export default function SearchHotelCard() {
             <div className='w-full flex-grow p-4 flex justify-between items-center flex-col bg-[#fbd789]'>
                 <div className='w-full flex justify-between items-center'>
                     <div className='flex flex-col'>
-                    <label htmlFor=""> Check in </label>
+                    <label > Check in </label>
                     <input min={todayDate} onChange={handleCheckIn} className='p-1 rounded-sm' type="date" />
                     </div>
 
                     <div className='flex flex-col'>
-                    <label htmlFor=""> Check out </label>
+                    <label > Check out </label>
                     <input min={minCheckIn} onChange={handleCheckOut} className='p-1 rounded-sm' type="date" />
                     </div>
                 </div>
@@ -110,7 +110,6 @@ export default function SearchHotelCard() {
 
                 <div className='flex w-full mt-8 justify-end'>
                     <button onClick={handleOnSubmit} className='py-2 px-3 bg-[#8f3237] rounded text-gray-0 hover:bg-[#77282c]'>Check Availability</button>
-
                 </div>
             </div>
         </aside>

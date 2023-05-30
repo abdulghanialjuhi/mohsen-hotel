@@ -37,7 +37,7 @@ export default function Profile() {
                             (
                                 <>
                                 <div onClick={() => window.location = `/secure-admin`} className='mt-3 flex w-full items-center justify-center hover:bg-gray-200 cursor-pointer rounded p-1'>
-                                    <button className='font-[600] p-1'>Dashboard</button>
+                                    <button className='font-[600] p-1'>Admin Page</button>
                                 </div>
                                 <div onClick={() => window.location = `/secure-admin-update-password`} className='mt-3 flex w-full items-center justify-center hover:bg-gray-200 cursor-pointer rounded p-1'>
                                     <button className='font-[600] p-1'>Update password</button>

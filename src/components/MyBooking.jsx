@@ -70,7 +70,9 @@ const EditDataForm = ({ tableName, keys, setData, setEditForm, record, disabledK
     }
 
     const handleOnSubmit = async () => {
-        const isNullishs = Object.values(formInput).some(value => {
+        const formRequired = {...formInput}
+        delete formRequired['receipt']
+        const isNullishs = Object.values(formRequired).some(value => {
             if (value === null || value === '') {
                 return true;
             }

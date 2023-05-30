@@ -19,6 +19,7 @@ export default function CheckOut() {
     const [promotionInput, setPromotionInput] = useState('')
     const [promotionLoading, setPromotionLoading] = useState(false)
     const [isValidCode, setIsValidCode] = useState('')
+    const [validCode, setValidCode] = useState('')
 
     const [isGuest, setIsGuest] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0)
@@ -57,7 +58,7 @@ export default function CheckOut() {
                 total += roomPrc.record.price * getNights()
             })
             const calculatePromotion = total * ( (100-discountPercent) / 100 )
-            setTotalPrice(calculatePromotion.toFixed(2)) 
+            setTotalPrice(calculatePromotion) 
         } catch (err) {
             navigate('/')
         }
@@ -147,25 +148,33 @@ export default function CheckOut() {
         setPromotionLoading(true)
         getCollectionDocument('promotions', promotionInput)
         .then((res) => {
-            // console.log(parseInt(res.percent));
             if (!isNaN(parseInt(res.percent))) {
                 const todayDate = new Date()
                 const expDate = new Date(res.expireDate.replaceAll('-', '/'))
                 if (todayDate.getTime() > expDate.getTime()) {
                     setDiscountPercent(0)
                     setIsValidCode('expired code!')
+                    setValidCode('')
                 } else {
                     setDiscountPercent(parseInt(res.percent))
+                    let total = 0;
+                    booking.room.forEach((roomPrc) => {
+                        total += roomPrc.record.price * getNights()
+                    })
+                    const calculatePromotion = total * ( (parseInt(res.percent)) / 100 )
+                    setValidCode(`Enjoy dicount of ${calculatePromotion} :)`)
                     setIsValidCode('')
                 }
             } else {
                 setDiscountPercent(0)
                 setIsValidCode('invalid code!')
+                setValidCode('')
             }
         }).catch((err) => {
             console.log(err);
             setDiscountPercent(0)
             setIsValidCode('invalid code!')
+            setValidCode('')
         }).finally(() => {
             setPromotionLoading(false)
         })
@@ -205,7 +214,8 @@ export default function CheckOut() {
                             <input value={promotionInput} onChange={(e) => setPromotionInput(e.target.value)} className='w-full p-1 rounded outline-none border' type="text" name="promotion" placeholder='Discount Code' />
                             <button disabled={promotionLoading} onClick={handleCheckPromotions} className='px-3 bg-primaryBlue rounded ml-[-10px] text-gray-0 hover:bg-[#1162be]'>{promotionLoading ? 'checking...' : 'Apply'}</button>
                         </div>
-                        {isValidCode && <span className='text-[11px] text-red-500'> {isValidCode} </span>}
+                        {isValidCode && <span className='text-[12px] text-red-500'> {isValidCode} </span>}
+                        {validCode && <span className='text-[12px] text-green-500'> {validCode} </span>}
                     </div>
 
                     <div className='mt-auto border-t w-full flex flex-col justify-center items-center'>

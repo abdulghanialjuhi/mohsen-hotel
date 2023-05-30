@@ -26,7 +26,6 @@ module.exports = {
           800: '#222222',
           900: '#111111'
         },
-        darkColor: '#0a0a0a',
         primaryBlue: '#0070f3',
       },
       display: ["group-hover"]
