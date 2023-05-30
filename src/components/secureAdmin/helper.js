@@ -6,8 +6,12 @@ export const setFormKeys = (keys, values={}) => {
         const obj = {}
         keys.forEach((key, i, arr) => {
             if (key !== 'section' && key !== 'bed Type') {
-                if (Object.keys(values).length > 0) {
-                    obj[key.replace(' ', '')] = values[key.replace(' ', '')]
+                if (Object.keys(values).length > 0 && !key.includes('image')) {
+                    if (values[key.replace(' ', '')]) {
+                        obj[key.replace(' ', '')] = values[key.replace(' ', '')]
+                    } else {
+                        obj[key.replace(' ', '')] = ''
+                    }
                 } else {
                     obj[key.replace(' ', '')] = ''
                 }

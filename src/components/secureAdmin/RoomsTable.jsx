@@ -7,7 +7,7 @@ import ModalForm from './ModalForm';
 export default function Rooms() {
 
     const [data, setData] = useState([])
-    const [keys] = useState(['name', 'room Number', 'price', 'roomType'])
+    const [keys] = useState(['name', 'room Number', 'roomType'])
     const [editForm, setEditForm] = useState(false)
     const [record, setRecord] = useState({})
     const tableName = 'rooms'

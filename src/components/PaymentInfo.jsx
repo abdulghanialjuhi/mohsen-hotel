@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { Context } from '../context/GlobalState';
 
 export default function PaymentInfo() {
 
@@ -7,10 +8,10 @@ export default function PaymentInfo() {
 
     const total = searchParams.get('total')
     const bookingId = searchParams.get('booking')
+    const { user } = useContext(Context)
 
     const handleOnSubmit = () => {
-        window.location = `auth-my-profile/wDzg7YrotoTzpVeSzsOoZnYNBBf2/upload-receipt?bookingId=${bookingId}`
-
+        window.location = `auth-my-profile/${user}/upload-receipt?bookingId=${bookingId}`
     }
     return (
         <div className='flex-grow flex mt-4 p-3 items-center justify-center'>

@@ -108,6 +108,14 @@ const MyDocument = ({ from, to, single, double, triple }) => {
                             <Text> {triple} </Text>
                         </View>
                     </View>
+                    <View style={[styles.tableBody, {marginTop: 20}]}>
+                        <View style={styles.tableText}>
+                            <Text > Total </Text>
+                        </View>
+                        <View style={styles.labelValue}>
+                            <Text> {triple} </Text>
+                        </View>
+                    </View>
                 </View>
             </Page>
         </Document>
@@ -140,7 +148,7 @@ export default function Admin() {
                 </aside>
                 <div className='w-[200px] h-[100px] border flex justify-center items-center'>
                     <button onClick={() => setShowReport(!showReport)} className='rounded py-2 px-3 bg-gray-800 text-gray-0 hover:bg-gray-900'>
-                        Print report
+                        Print Report
                     </button>
                     {showReport && <PrintReport setShowReport={setShowReport} />}
                 </div>
@@ -174,7 +182,7 @@ const PrintReport = ({ setShowReport }) => {
 
             const checkin = new Date(book.record.checkInDate.replaceAll('-', '/'))
             
-            if(checkin.getTime() <= to && checkin.getTime() >= from) {
+            if (checkin.getTime() <= to && checkin.getTime() >= from) {
                 const roomRes = await getCollectionDocument('rooms', book.record.roomNumber)
 
                 if (roomRes.roomType === 'type_single') {
@@ -187,6 +195,7 @@ const PrintReport = ({ setShowReport }) => {
             }
         }
 
+        console.log('booking: ', booking);
         return [singleType, doubleType, tripleType]
 
     }
@@ -244,7 +253,7 @@ const PrintReport = ({ setShowReport }) => {
                             <input min={fromDate+1} onChange={(e) => setToDate(e.target.value)} value={toDate} type="date" className='border p-2' />
                         </div>
                     </div>
-                    {fromDate && toDate && Object.keys(typesQuty).length > 0 && <PDFDownloadLink document={< MyDocument from={fromDate} to={toDate} single={typesQuty.singleType} double={typesQuty.doubleType} triple={typesQuty.tripleType}/>} fileName="hotel-report.pdf">
+                    {fromDate && toDate && Object.keys(typesQuty).length > 0 && <PDFDownloadLink document={< MyDocument from={fromDate} to={toDate} single={typesQuty.singleType} double={typesQuty.doubleType} triple={typesQuty.tripleType} total={typesQuty} />} fileName="hotel-report.pdf">
                     {({ blob, url, loading, error }) => (
                         <div className='w-full flex p-1 justify-center mt-5'>
                             <button className='rounded p-2 text-gray-0 bg-primaryBlue'> 

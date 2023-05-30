@@ -126,7 +126,7 @@ export default function Hotels() {
 
 export const HotelRoom = (props) => {
 
-    const { name, price, roomType } = props.room.record
+    const { name, roomType } = props.room.record
 
     const [roomPic, setRoomPic] = useState([])
     const [selectedType, setSelectedType] = useState(0)
@@ -141,7 +141,6 @@ export const HotelRoom = (props) => {
 
         getCollectionDocument(`roomType`, roomType)
         .then((res) => {
-            // console.log(res);
             setFacilitiesData(res)
         }).catch((err) => {
             console.log(err)
@@ -165,6 +164,7 @@ export const HotelRoom = (props) => {
         try {
             const avalibeRooms = await props.hndleAddNewRoomChecker(roomType)
             if (avalibeRooms.length > 0) {
+                avalibeRooms[0].record.price = facilitiesData.price
                 actions({type: 'SET_BOOKING', payload: {...booking, room: [avalibeRooms[0]]}})
                 navigate('/check-out')
             } else {
@@ -205,6 +205,7 @@ export const HotelRoom = (props) => {
                     item.id === avalibeRooms[0].id 
                     ? {...item, checked : true}
                     : item ))
+                    avalibeRooms[0].record.price = facilitiesData.price
                     props.setSlectedRoomNumber(prev => [...prev, avalibeRooms[0]])
                     setSelectedType(prev => prev + 1)
             } else {
@@ -244,7 +245,7 @@ export const HotelRoom = (props) => {
                                 <li className='flex items-center gap-1'> <MdOutlineAir size={22}/> Air conditioning  </li>
                             </div>
                         </ul>
-                        <h4 className='mt-auto'> ${price}/night  </h4>
+                        <h4 className='mt-auto'> ${facilitiesData.price}/night  </h4>
                     </div>
 
                     <div className={`flex ${booking.rooms > 1 ? 'justify-between' : 'justify-end'} items-center w-full gap-3`}>

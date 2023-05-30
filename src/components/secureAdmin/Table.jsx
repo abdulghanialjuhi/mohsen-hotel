@@ -85,7 +85,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
     } 
 
     return (
-        <div>
+        <div className=''>
             <div className='flex justify-between items-center w-full h-12 my-4'>
                 <span className='capitalize'> {tableName} </span>
                 <div className='flex gap-3'>
@@ -108,7 +108,7 @@ export default function Table({ tableName, data, keys, handleDelete, setData, is
                 <div className='flex items-center justify-evenly w-full h-10 bg-gray-700'>
                     {keys.map((head) => (
                         !head.includes('password') &&
-                        <span className='text-gray-100 px-2 overflow-hidden w-full text-center' key={head}> {head} </span>
+                        <span className='text-gray-100 px-2 overflow-hidden capitalize w-full text-center' key={head}> {head} </span>
                     ))}
                 </div>
                 <div className='p-1 max-h-[500px] overflow-scroll scrollbar-hide'>
@@ -196,7 +196,7 @@ const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditReco
                     </div>}
 
                 </div>
-                {!isAdmin && tableName === 'booking' && !field.record['receipt'] && additionalComponent && (
+                {!isAdmin && tableName === 'booking' && field.record['status'] === 'pending' && additionalComponent && (
                     <>
                         {React.cloneElement(additionalComponent, { field: field })}
                     </>

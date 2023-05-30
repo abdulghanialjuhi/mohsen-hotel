@@ -47,7 +47,6 @@ export default function MyBooking() {
 }
 
 const EditDataForm = ({ tableName, keys, setData, setEditForm, record, disabledKeys }) => {
-    console.log('record: ', record);
 
     const [formInput, setFormInput] = useState({})
     const [fonmLoading, setFonmLoading] = useState(false)
@@ -102,13 +101,15 @@ const EditDataForm = ({ tableName, keys, setData, setEditForm, record, disabledK
 
             for (let room of rooms) {
                 const roomRes = await getCollectionDocument('rooms', room)
-                const roomType = await getNestedCollectionData('rooms', 'roomType', roomRes.roomType)
+                const roomType = await getCollectionDocument('roomType', roomRes.roomType)
+                const rooms = await getNestedCollectionData('rooms', 'roomType', roomRes.roomType)
 
-                for (let item of roomType) {
+                for (let item of rooms) {
                     if (roomsBooked.includes(item.id)) continue
                     const res = await checkAvailability(item, formInput.checkInDate, formInput.checkOutDate, record.id)
                     if (res) {
                         roomsBooked.push(item.id)
+                        item.record.price = roomType.price
                         roomsAvalible.push(item)
                         break
                     }
@@ -119,11 +120,6 @@ const EditDataForm = ({ tableName, keys, setData, setEditForm, record, disabledK
             roomsAvalible.forEach((room) => {
                 total += room.record.price * getNights(formInput.checkInDate, formInput.checkOutDate)
             })
-
-            // if (total !== parseInt(formInput['total']) && formInput['status'] === 'paid') {
-            //     alert('Sorry, you are not abele to update the booking, due to price difference')
-            //     return
-            // }
 
             var result = roomsAvalible.map(u => u.record.roomNumber).join(', ')
             if (formInput['status'] === 'paid') {
