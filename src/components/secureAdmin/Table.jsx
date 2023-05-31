@@ -182,6 +182,8 @@ const Record = ({ field, keys, handleDelete, tableName, isDelete, handleEditReco
                     key.includes('guest') && tableName === 'booking' ? (
                         <button onClick={handleGuestClick.bind(this, field.record['id'])} key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden text-primaryBlue'> {field.record[key.replace(' ', '')]?.toString()} </button>
                     ) : (
+                        (tableName === 'booking' && key.includes('receipt') && 
+                    field.record['status']  === 'pending') ? <span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'>  </span> :
                         <span key={key} className='w-full h-[25px] text-center max-w-[200px] overflow-hidden'> {field.record[key.replace(' ', '')]?.toString()} </span>
                     )
                 )))}
